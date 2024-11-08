@@ -1,30 +1,25 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import { Container, Card, ListGroup, Button, Badge } from "react-bootstrap";
-import apiInstance from "../../utils/axios";
 import useUserData from "../../plugin/useUserData";
+import { useNotification } from "../../hooks/notification/useNotification";
+import { useQueryClient } from "@tanstack/react-query";
+import { markNotiAsSeenAPI } from "../../api/noti";
 import Toast from "../../plugin/Toast";
 
 function Notifications() {
-  const [noti, setNoti] = useState([]);
   const userId = useUserData()?.user_id;
+  const { data: noti = [] } = useNotification(userId);
+  const queryClient = useQueryClient(); 
 
-  const fetchNoti = async () => {
-    const response = await apiInstance.get(
-      `author/dashboard/noti-list/${userId}/`
-    );
-    setNoti(response.data);
-  };
-
-  useEffect(() => {
-    fetchNoti();
-    noti.forEach(n => console.log(n))
-  }, []);
-
-  const handleMarkNotiAsSeen = async (notiId) => {
-    await apiInstance.post("author/dashboard/noti-mark-seen/", { noti_id: notiId });
-    Toast("success", "Notification Seen", "");
-    fetchNoti();
+  const handleMarkNotiAsSeen = (notiId) => { 
+    markNotiAsSeenAPI(notiId)
+    .then(() => { 
+      Toast("success", "Notification Seen", "");
+      queryClient.invalidateQueries(['noti']); 
+    })
+    .catch((err) => { 
+      Toast("error", "Failed to mark notification as seen", "Please try again later."); 
+    }); 
   };
 
   return (

@@ -3,7 +3,7 @@ import { useLocation } from "react-router-dom";
 import PostList from "../../components/card/postList";
 import PaginationPost from "../../components/card/paginationPost";
 import usePostStore from "../../store/usePostStore";
-import { useSearchPosts } from "../../hooks/useSearchPosts";
+import { useSearchPosts } from "../../hooks/post/useSearchPosts";
 
 function useQuery() {
   return new URLSearchParams(useLocation().search);

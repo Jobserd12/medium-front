@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { fetchPostsAPI } from '../api/posts';
-import usePostStore from '../store/usePostStore';
+import { fetchPostsAPI } from '../../api/posts';
+import usePostStore from '../../store/usePostStore';
 
 export const usePosts = (page) => {
   const queryClient = useQueryClient();
@@ -16,6 +16,10 @@ export const usePosts = (page) => {
       return res.data.results || [];
     },
     keepPreviousData: true,
-    onError: (err) => console.error("Error fetching posts:", err)
+    onError: (err) => { 
+      console.error("Error fetching posts:", err); 
+      Toast("error", "Failed to fetch posts", "Please try again later."); 
+    }, 
+    useErrorBoundary: true 
   });
 };

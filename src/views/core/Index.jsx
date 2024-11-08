@@ -3,9 +3,9 @@ import PaginationPost from "../../components/card/paginationPost";
 import PostList from "../../components/card/postList";
 import CategoryCard from "../../components/card/categoryCard";
 import usePostStore from "../../store/usePostStore";
-import { useCategories } from "../../hooks/useCategories";
-import { usePopularPosts } from "../../hooks/usePopularPosts";
-import { usePosts } from "../../hooks/usePosts";
+import { useCategories } from "../../hooks/post/useCategories";
+import { usePopularPosts } from "../../hooks/post/usePopularPosts";
+import { usePosts } from "../../hooks/post/usePosts";
 
 function Index() {
   const { currentPagePosts, setCurrentPagePosts, totalPagesPosts } = usePostStore();

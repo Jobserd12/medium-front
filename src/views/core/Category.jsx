@@ -6,8 +6,8 @@ import PaginationPost from "../../components/card/paginationPost";
 import CategoryCard from "../../components/card/categoryCard";
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
-import { useCategories } from "../../hooks/useCategories";
-import { usePostsByCategory } from "../../hooks/usePostsByCategory";
+import { useCategories } from "../../hooks/post/useCategories";
+import { usePostsByCategory } from "../../hooks/post/usePostsByCategory";
 
 function Category() {
   const { slug } = useParams();

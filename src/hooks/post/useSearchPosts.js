@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { searchPostsAPI } from '../api/posts';
-import usePostStore from '../store/usePostStore';
+import { searchPostsAPI } from '../../api/posts';
+import usePostStore from '../../store/usePostStore';
 
 export const useSearchPosts = (query, page) => {
   const queryClient = useQueryClient();

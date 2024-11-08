@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { fetchPostsByCategoryAPI } from '../api/posts';
-import usePostStore from '../store/usePostStore';
+import { fetchPostsByCategoryAPI } from '../../api/posts';
+import usePostStore from '../../store/usePostStore';
 
 export const usePostsByCategory = (slug) => {
   const queryClient = useQueryClient();

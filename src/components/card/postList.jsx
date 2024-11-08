@@ -1,10 +1,12 @@
 import PostCard from './postCard';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
+import ErrorBoundary from '../../utils/ErrorBoundary ';
 
 function PostList({ posts, isLoading }) {
 
     return (
+        <ErrorBoundary>
         <div className="row">
             {isLoading ? (
                 Array(6).fill(0).map((_, index) => (
@@ -40,6 +42,7 @@ function PostList({ posts, isLoading }) {
                 ))
             )}
         </div>
+        </ErrorBoundary>
     );
 }
 

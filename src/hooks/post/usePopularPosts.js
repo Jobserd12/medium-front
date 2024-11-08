@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { fetchPopularPostsAPI } from '../api/posts';
+import { fetchPopularPostsAPI } from '../../api/posts';
 
 export const usePopularPosts = () => {
   return useQuery({
