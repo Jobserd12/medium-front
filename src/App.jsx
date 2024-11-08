@@ -34,7 +34,6 @@ function App() {
     <>
       <BrowserRouter>
         <QueryClientProvider client={queryClient}>
-          {/* Your components */}
           <ErrorBoundary>
             <MainWrapper>
               <Routes>
@@ -73,7 +72,6 @@ function App() {
                 <Route path="/contact/" element={<Contact />} />
 
                 <Route path="*" element={<ErrorPage />} />
-                
               </Routes>
             </MainWrapper>
           </ErrorBoundary>
