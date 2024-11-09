@@ -5,28 +5,39 @@ import { useNotification } from "../../hooks/notification/useNotification";
 import { useQueryClient } from "@tanstack/react-query";
 import { markNotiAsSeenAPI } from "../../api/noti";
 import Toast from "../../plugin/Toast";
+import { Link } from "react-router-dom";
 
 function Notifications() {
   const userId = useUserData()?.user_id;
   const { data: noti = [] } = useNotification(userId);
-  const queryClient = useQueryClient(); 
+  const queryClient = useQueryClient();
 
-  const handleMarkNotiAsSeen = (notiId) => { 
+  const handleMarkNotiAsSeen = (notiId) => {
     markNotiAsSeenAPI(notiId)
-    .then(() => { 
-      Toast("success", "Notification Seen", "");
-      queryClient.invalidateQueries(['noti']); 
-    })
-    .catch((err) => { 
-      Toast("error", "Failed to mark notification as seen", "Please try again later."); 
-    }); 
+      .then(() => {
+        Toast("success", "Notification Seen", "");
+        queryClient.invalidateQueries(["noti"]);
+      })
+      .catch((err) => {
+        Toast(
+          "error",
+          "Failed to mark notification as seen",
+          "Please try again later."
+        );
+      });
   };
 
+  useEffect(() => {
+    noti.forEach((n) => {
+      console.log(n);
+    });
+    console.log(noti.length)
+  });
   return (
-    <section className="pt-5 pb-5">
+    <section className="pb-5">
       <Container>
-        <div className="mb-5">
-          <h1 className="display-4">Notifications</h1>
+        <div className="mb-4">
+          <h2 style={{ fontWeight: 'bold', fontFamily: 'Arial, sans-serif' }}>Notifications</h2>
         </div>
         <Card>
           <Card.Body>
@@ -35,7 +46,7 @@ function Notifications() {
                 noti.map((n, index) => (
                   <ListGroup.Item
                     key={index}
-                    className="d-flex align-items-center justify-content-between"
+                    className="d-flex align-items-center justify-content-between  mt-2"
                   >
                     <div className="d-flex align-items-center">
                       <div className="icon-lg bg-opacity-15 rounded-2 flex-shrink-0 me-3">
@@ -50,31 +61,39 @@ function Notifications() {
                         )}
                       </div>
                       <div>
-                        <h6 className="mb-0">{n.type}</h6>
                         <p className="mb-1">
                           {n.type === "Like" && (
-                            <>{n.actor_username} liked your post <b>{n.post?.title?.slice(0, 30) + "..."}</b></>
+                            <>
+                              {n.actor_username} <b>liked</b> your post{" "}
+                            </>
                           )}
                           {n.type === "Comment" && (
                             <>
-                              {n.actor_username} a new comment on <b>{n.post?.title?.slice(0, 30) + "..."}</b>
-                              <button>Ver comentario</button>
+                              {n.actor_username} <b>commented</b> on your post{" "}
                             </>
                           )}
                           {n.type === "Bookmark" && (
-                            <>{n.actor_username} bookmarked your post <b>{n.post?.title?.slice(0, 30) + "..."}</b></>
+                            <>
+                              {n.actor_username} <b>bookmarked</b> your post{" "}
+                            </>
                           )}
                         </p>
-                        <Badge variant="secondary" className="small">5 min ago</Badge>
+                        <p className="m-0">{n.post?.title}</p>
+                        {n.type === "Comment" && (
+                          <Link to="/comments/">Ver comentarios</Link>
+                        )}
                       </div>
                     </div>
-                    <Button
-                      variant="outline-secondary"
-                      size="sm"
-                      onClick={() => handleMarkNotiAsSeen(n.id)}
-                    >
-                      <i className="fas fa-check-circle"></i>
-                    </Button>
+                    <div>
+                      <span className="small me-4"> {new Date(n.date).toLocaleTimeString()} </span>
+                      <Button
+                        variant="outline-secondary"
+                        size="sm"
+                        onClick={() => handleMarkNotiAsSeen(n.id)}
+                      >
+                        <i className="fas fa-check-circle"></i>
+                      </Button>
+                    </div>
                   </ListGroup.Item>
                 ))
               ) : (

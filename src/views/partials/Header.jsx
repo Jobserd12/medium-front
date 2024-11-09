@@ -1,15 +1,21 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/auth';
 import SearchBar from '../../components/ui/searchBar';
 import Login from '../auth/Login';
 import UserProfile from '../../components/ui/userProfile';
+import useNotificationStore from '../../store/useNotificationStore';
+import useUserData from '../../plugin/useUserData';
+import { useNotification } from '../../hooks/notification/useNotification';
 
 function Header() {
     const isLoggedIn = useAuthStore((state) => state.isLoggedIn());
     const [showLoginModal, setShowLoginModal] = useState(false);
+    const unreadCount = useNotificationStore((state) => state.unreadCount); 
     const location = useLocation();
     const navigate = useNavigate();
+    const userId = useUserData()?.user_id; 
+    const { refetch } = useNotification(userId);
 
     const handleShowLoginModal = () => setShowLoginModal(!showLoginModal);
     const isActive = (path) => location.pathname === path ? 'active-link' : '';
@@ -18,6 +24,10 @@ function Header() {
         navigate(`/search?query=${q}`);
     };
 
+    useEffect(() => { 
+        refetch();
+    },[]);
+    
     return (
         <header className="col-lg-12 bg-white rounded shadow-sm sticky-header">
             <nav className="navbar navbar-expand-lg p-0">
@@ -48,8 +58,9 @@ function Header() {
                                 {isLoggedIn ? (
                                     <>
                                         <li className="nav-item">
-                                            <Link to="/notifications" className="btn">
+                                            <Link to="/notifications" className="btn position-relative">
                                                 <i className={isActive("/notifications") ? "fa-solid fa-bell" : "fa-regular fa-bell"}></i>
+                                                {unreadCount > 0 && ( <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary"> {unreadCount} </span> )}
                                             </Link>
                                         </li>
                                         <li className="nav-item">
