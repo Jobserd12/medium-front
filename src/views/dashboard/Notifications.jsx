@@ -56,7 +56,10 @@ function Notifications() {
                             <>{n.actor_username} liked your post <b>{n.post?.title?.slice(0, 30) + "..."}</b></>
                           )}
                           {n.type === "Comment" && (
-                            <>{n.actor_username} a new comment on <b>{n.post?.title?.slice(0, 30) + "..."}</b></>
+                            <>
+                              {n.actor_username} a new comment on <b>{n.post?.title?.slice(0, 30) + "..."}</b>
+                              <button>Ver comentario</button>
+                            </>
                           )}
                           {n.type === "Bookmark" && (
                             <>{n.actor_username} bookmarked your post <b>{n.post?.title?.slice(0, 30) + "..."}</b></>

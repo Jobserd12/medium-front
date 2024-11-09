@@ -11,6 +11,7 @@ import useUserData from "../../plugin/useUserData";
 function Detail() {
   const [post, setPost] = useState([]);
   const [tags, setTags] = useState([]);
+  const userData = useUserData();
   const [createComment, setCreateComment] = useState({
     full_name: "",
     email: "",
@@ -21,11 +22,15 @@ function Detail() {
   const MINIMUM_TIME_ON_PAGE = 5000; // 5 segundos
 
   const fetchPost = async () => {
-    const response = await apiInstance.get(`post/detail/${param.slug}/`);
-    setPost(response.data);
-    console.log(response.data);
-    const tagArray = response.data?.tags?.split(",");
-    setTags(tagArray);
+    try {
+      const response = await apiInstance.get(`post/detail/${param.slug}/`);
+      setPost(response.data);
+      console.log(response.data);
+      const tagArray = response.data?.tags?.split(",");
+      setTags(tagArray);
+    } catch(err) {
+      console.log(err)
+    }
   };
 
   useEffect(() => {
@@ -60,6 +65,7 @@ function Detail() {
       name: createComment.full_name,
       email: createComment.email,
       comment: createComment.comment,
+      user_id: userData?.user_id
     };
 
     const response = await apiInstance.post(`post/comment-post/`, jsonData);
@@ -71,8 +77,6 @@ function Detail() {
       comment: "",
     });
   };
-
-  const userData = useUserData();
 
   const handleLikePost = async (postId) => {
       if (!userData) {

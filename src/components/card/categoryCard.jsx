@@ -24,7 +24,7 @@ function CategoryCard({ categories = [] }) {
       </button>
 
       <div 
-        className="d-flex gap-2 ms-4" 
+        className="d-flex gap-2 mx-4" 
         ref={scrollRef} 
         style={{ overflowX: "hidden", whiteSpace: "nowrap", scrollBehavior: "smooth" }}
       >
