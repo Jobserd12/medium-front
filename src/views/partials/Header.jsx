@@ -14,8 +14,8 @@ function Header() {
     const unreadCount = useNotificationStore((state) => state.unreadCount); 
     const location = useLocation();
     const navigate = useNavigate();
-    const userId = useUserData()?.user_id; 
-    const { refetch } = useNotification(userId);
+    const userData = useUserData();
+    const { refetch } = useNotification();
 
     const handleShowLoginModal = () => setShowLoginModal(!showLoginModal);
     const isActive = (path) => location.pathname === path ? 'active-link' : '';
@@ -26,7 +26,7 @@ function Header() {
 
     useEffect(() => { 
         refetch();
-    },[]);
+    },[isLoggedIn, userData?.user_id]);
     
     return (
         <header className="col-lg-12 bg-white rounded shadow-sm sticky-header">
