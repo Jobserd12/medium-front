@@ -48,7 +48,7 @@ const Dashboard = () => {
       console.error('Error marking notification as seen:', error);
       Toast('error', 'Failed to mark notification as seen', '');
     }
-  };
+  }
 
   return (
     <>
@@ -66,7 +66,7 @@ const Dashboard = () => {
           <CommentsSection comments={comments} />
 
           {/* Notifications Section */}
-          <NotificationsSection notifications={notifications} handleMarkNotificationAsSeen={handleMarkNotificationAsSeen} />
+          {/* <NotificationsSection notifications={notifications} handleMarkNotificationAsSeen={handleMarkNotificationAsSeen} /> */}
 
           {/* Blog Posts Table */}
           {/* <BlogPostsTable posts={posts} /> */}

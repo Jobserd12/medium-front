@@ -116,3 +116,24 @@ header {
 .active-link {
   font-weight: bold;
 }
+
+
+.hover-bg-light:hover {
+  background-color: rgba(0,0,0,0.02);
+}
+
+.btn-icon {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+  color: #6c757d;
+}

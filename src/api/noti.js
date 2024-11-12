@@ -5,3 +5,8 @@ export const fetchNotiAPI = (userId)  =>
 
 export const markNotiAsSeenAPI = (notiId) => 
     apiInstance.post("author/dashboard/noti-mark-seen/", { noti_id: notiId });
+
+export const deleteNotiAPI = (notiId) => 
+    apiInstance.delete(`notifications/${notiId}/`);
+
+

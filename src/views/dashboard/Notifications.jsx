@@ -1,105 +1,119 @@
 import React, { useState, useEffect } from "react";
-import { Container, Card, ListGroup, Button, Badge } from "react-bootstrap";
+import { Container, Card, ListGroup, Button, Badge, Tab, Tabs } from "react-bootstrap";
 import useUserData from "../../plugin/useUserData";
 import { useNotification } from "../../hooks/notification/useNotification";
 import { useQueryClient } from "@tanstack/react-query";
-import { markNotiAsSeenAPI } from "../../api/noti";
+import { deleteNotiAPI, markNotiAsSeenAPI } from "../../api/noti";
 import Toast from "../../plugin/Toast";
 import { Link } from "react-router-dom";
+import NotificationItem from "../../components/dashboard/notificationItem";
+
 
 function Notifications() {
   const userId = useUserData()?.user_id;
-  const { data: noti = [] } = useNotification(userId);
+  const { data: notifications = [] } = useNotification(userId);
   const queryClient = useQueryClient();
+  const [activeTab, setActiveTab] = useState('unread');
+
+  const unreadNotifications = notifications.filter(n => !n.seen);
+  const readNotifications = notifications.filter(n => n.seen);
 
   const handleMarkNotiAsSeen = (notiId) => {
     markNotiAsSeenAPI(notiId)
       .then(() => {
-        Toast("success", "Notification Seen", "");
+        Toast("success", "Marked as read", "");
         queryClient.invalidateQueries(["noti"]);
       })
       .catch((err) => {
-        Toast(
-          "error",
-          "Failed to mark notification as seen",
-          "Please try again later."
-        );
+        Toast("error", "Failed to mark as read", "Please try again later.");
       });
   };
 
-  useEffect(() => {
-    noti.forEach((n) => {
-      console.log(n);
-    });
-    console.log(noti.length)
-  });
+  const handleDeleteNoti = (notiId) => {
+    deleteNotiAPI(notiId)
+      .then(() => {
+        Toast("success", "Notification deleted", "");
+        queryClient.invalidateQueries(["noti"]);
+      })
+      .catch((err) => {
+        Toast("error", "Failed to delete notification", "Please try again later.");
+      });
+  };
+
   return (
     <section className="pb-5">
       <Container>
-        <div className="mb-4">
-          <h2 style={{ fontWeight: 'bold', fontFamily: 'Arial, sans-serif' }}>Notifications</h2>
+        <div className="d-flex justify-content-between align-items-center mb-4">
+          <h2 className="fw-bold m-0">Notifications</h2>
+          <div className="d-flex gap-2">
+            {unreadNotifications.length > 0 && (
+              <Badge bg="danger" pill>
+                {unreadNotifications.length} new
+              </Badge>
+            )}
+          </div>
         </div>
-        <Card>
-          <Card.Body>
-            <ListGroup variant="flush">
-              {noti.length > 0 ? (
-                noti.map((n, index) => (
-                  <ListGroup.Item
-                    key={index}
-                    className="d-flex align-items-center justify-content-between  mt-2"
-                  >
-                    <div className="d-flex align-items-center">
-                      <div className="icon-lg bg-opacity-15 rounded-2 flex-shrink-0 me-3">
-                        {n.type === "Like" && (
-                          <i className="fas fa-thumbs-up text-primary fs-5"></i>
-                        )}
-                        {n.type === "Comment" && (
-                          <i className="bi bi-chat-left-quote-fill text-success fs-5"></i>
-                        )}
-                        {n.type === "Bookmark" && (
-                          <i className="fas fa-bookmark text-danger fs-5"></i>
-                        )}
-                      </div>
-                      <div>
-                        <p className="mb-1">
-                          {n.type === "Like" && (
-                            <>
-                              {n.actor_username} <b>liked</b> your post{" "}
-                            </>
-                          )}
-                          {n.type === "Comment" && (
-                            <>
-                              {n.actor_username} <b>commented</b> on your post{" "}
-                            </>
-                          )}
-                          {n.type === "Bookmark" && (
-                            <>
-                              {n.actor_username} <b>bookmarked</b> your post{" "}
-                            </>
-                          )}
-                        </p>
-                        <p className="m-0">{n.post?.title}</p>
-                        {n.type === "Comment" && (
-                          <Link to="/comments/">Ver comentarios</Link>
-                        )}
-                      </div>
-                    </div>
-                    <div>
-                      <span className="small me-4"> {new Date(n.date).toLocaleTimeString()} </span>
-                      <Button
-                        variant="outline-secondary"
-                        size="sm"
-                        onClick={() => handleMarkNotiAsSeen(n.id)}
-                      >
-                        <i className="fas fa-check-circle"></i>
-                      </Button>
-                    </div>
-                  </ListGroup.Item>
-                ))
-              ) : (
-                <p className="text-center">No notifications yet</p>
-              )}
-            </ListGroup>
+
+        <Card className="shadow-sm">
+          <Card.Body className="p-0">
+            <Tabs
+              activeKey={activeTab}
+              onSelect={(k) => setActiveTab(k)}
+              className="mb-3 px-3 pt-3"
+            >
+              <Tab 
+                eventKey="unread" 
+                title={
+                  <span>
+                    Unread <Badge bg="danger">{unreadNotifications.length}</Badge>
+                  </span>
+                }
+              >
+                <ListGroup variant="flush">
+                  {unreadNotifications.length > 0 ? (
+                    unreadNotifications.map((notification) => (
+                      <NotificationItem
+                        key={notification.id}
+                        notification={notification}
+                        onMarkSeen={handleMarkNotiAsSeen}
+                        onDelete={handleDeleteNoti}
+                        isSeen={false}
+                      />
+                    ))
+                  ) : (
+                    <ListGroup.Item className="text-center py-5">
+                      No unread notifications
+                    </ListGroup.Item>
+                    )}
+                </ListGroup>
+              </Tab>
+              <Tab 
+                eventKey="read" 
+                title={
+                  <span>
+                    Read <Badge bg="secondary">{readNotifications.length}</Badge>
+                  </span>
+                }
+              >
+                <ListGroup variant="flush">
+                  {readNotifications.length > 0 ? (
+                    readNotifications.map((notification) => (
+                      <NotificationItem
+                        key={notification.id}
+                        notification={notification}
+                        onMarkSeen={handleMarkNotiAsSeen}
+                        onDelete={handleDeleteNoti}
+                        isSeen={true}
+                      />
+                    ))
+                  ) : (
+                    <ListGroup.Item className="text-center py-5">
+                      No read notifications
+                    </ListGroup.Item>
+                    )}
+                </ListGroup>
+              </Tab>
+            </Tabs>
           </Card.Body>
         </Card>
       </Container>
