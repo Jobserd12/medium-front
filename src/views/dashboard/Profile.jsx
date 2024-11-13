@@ -1,11 +1,36 @@
 import React, { useState, useEffect } from "react";
-import Header from "../partials/Header";
-import Footer from "../partials/Footer";
 import { Link } from "react-router-dom";
-
+import { Button, Tabs, Tab, Dropdown, Card, CardBody } from "react-bootstrap";
 import apiInstance from "../../utils/axios";
 import useUserData from "../../plugin/useUserData";
 import Toast from "../../plugin/Toast";
+import { fetchProfileAPI } from "../../api/user";
+import EditProfileModal from "../../components/ui/editProfileModal";
+
+// Datos ficticios para las listas guardadas
+const savedLists = [
+    {
+        id: 1,
+        title: "My Reading List",
+        createAt: "2024-03-15",
+        items: 12,
+        access: false
+    },
+    {
+        id: 2,
+        title: "Tech Innovations",
+        createAt: "2024-03-10",
+        items: 8,
+        access: true
+    },
+    {
+        id: 3,
+        title: "Design Inspiration",
+        createAt: "2024-03-05",
+        items: 15,
+        access: false
+    }
+];
 
 function Profile() {
     const [profileData, setProfileData] = useState({
@@ -16,178 +41,154 @@ function Profile() {
         facebook: "",
         twitter: "",
         country: "",
+        followers: [],
+        following: []
     });
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [activeTab, setActiveTab] = useState('home');
     const userId = useUserData()?.user_id;
 
-    const [imagePreview, setImagePreview] = useState("");
-    const [loading, setLoading] = useState(false);
+    const handleShowModal = () => setShowEditModal(true);
+    const handleCloseModal = () => setShowEditModal(false);
+    
+    const handleProfileUpdate = (updatedProfile) => {
+        setProfileData(updatedProfile);
+        fetchProfile();
+    };
 
-    const fetchProfile = () => {
-        apiInstance.get(`user/profile/${userId}/`).then((res) => {
-            setProfileData(res.data);
-        });
+    const fetchProfile = async () => {
+        try {
+            const profileRes = await fetchProfileAPI(userId);
+            setProfileData(profileRes.data);
+        } catch (err) {
+            console.error("There was an error fetching the data!", err.response.data);
+        }
     };
 
     useEffect(() => {
         fetchProfile();
-    }, []);
-
-    const handleProfileChange = (event) => {
-        setProfileData({
-            ...profileData,
-            [event.target.name]: event.target.value,
-        });
-    };
-
-    const handleFileChange = (event) => {
-        const selectedFile = event.target.files[0];
-        setProfileData({
-            ...profileData,
-            [event.target.name]: selectedFile,
-        });
-
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            setImagePreview(reader.result);
-        };
-        if (selectedFile) {
-            reader.readAsDataURL(selectedFile);
-        }
-    };
-
-    const handleFormSubmit = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-
-        const res = await apiInstance.get(`user/profile/${userId}/`);
-
-        const formData = new FormData();
-        if (profileData.image && profileData.image !== res.data.image) {
-            formData.append("image", profileData.image);
-        }
-        formData.append("full_name", profileData.full_name);
-        formData.append("about", profileData.about);
-        formData.append("facebook", profileData.facebook);
-        formData.append("twitter", profileData.twitter);
-        formData.append("country", profileData.country);
-
-        try {
-            const res = await apiInstance.patch(`user/profile/${userId}/`, formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
-            });
-            Toast("success", "Profile updated successfully", "");
-            setLoading(false);
-        } catch (error) {
-            console.error("Error updating profile:", error);
-            Toast("error", "An Error Occured", "");
-        }
-    };
+    }, [userId]);
 
     return (
-        <>
-            <section className="pt-5 pb-5">
-                <div className="container">
-                    <div className="row mt-0 mt-md-4">
-                        <div className="col-lg-12 col-md-8 col-12">
-                            {/* Card */}
-                            <div className="card">
-                                {/* Card header user*/}
-                                <div className="card-header">
-                                    <h3 className="mb-0">Profile Details</h3>
-                                    <p className="mb-0">You have full control to manage your own account setting.</p>
-                                </div>
-                                {/* Card body */}
-                                <form className="card-body" onSubmit={handleFormSubmit}>
-                                    <div className="d-lg-flex align-items-center justify-content-between">
-                                        <div className="d-flex align-items-center mb-4 mb-lg-0">
-                                            <img
-                                                src={imagePreview || profileData?.image}
-                                                id="img-uploaded"
-                                                className="avatar-xl rounded-circle"
-                                                alt="avatar"
-                                                style={{
-                                                    width: "100px",
-                                                    height: "100px",
-                                                    borderRadius: "50%",
-                                                    objectFit: "cover",
-                                                }}
-                                            />
+        <div className="container-fluid py-4" style={{ maxWidth: "1200px" }}>
+            <div className="row">
+                {/* Primera columna */}
+                <div className="col-lg-8">
+                    <div className="d-flex justify-content-between align-items-center mb-4">
+                        <h1 className="h3 mb-0">{profileData.full_name}</h1>
+                        <Dropdown>
+                            <Dropdown.Toggle variant="light" className="border-0">
+                                <i class="fa-solid fa-ellipsis-vertical"></i>
+                            </Dropdown.Toggle>
+                            <Dropdown.Menu>
+                                <Dropdown.Item>Share Profile</Dropdown.Item>
+                                <Dropdown.Item>Design Profile</Dropdown.Item>
+                            </Dropdown.Menu>
+                        </Dropdown>
+                    </div>
 
-                                            <div className="ms-3">
-                                                <h4 className="mb-0">Your avatar</h4>
-                                                <p className="mb-0">PNG or JPG no bigger than 800px wide and tall.</p>
-                                                <input type="file" name="image" className="form-control mt-3" onChange={handleFileChange} />
+                    {/* Tabs */}
+                    <Tabs
+                        activeKey={activeTab}
+                        onSelect={(k) => setActiveTab(k)}
+                        className="mb-4"
+                    >
+                        <Tab eventKey="home" title="Home">
+                            <div className="py-3">
+                                {savedLists.map(list => (
+                                    <Card key={list.id} className="border mb-3 shadow-md">
+                                        <div className="row no-gutters">
+                                            <div className="col-md-8">
+                                                <CardBody>
+                                                    <div className="mb-3">
+                                                        <h5 style={{ letterSpacing: '-2px', fontWeight: 'bold', fontFamily: 'sans-serif' }}>{list.title}</h5>
+                                                        <spa className="small">Saved on {list.createAt}</spa>
+                                                    </div>
+                                                    <div className="d-flex align-items-center justify-content-between">
+                                                        <p className="text-muted small mb-2">
+                                                            {list.items} items &nbsp;&nbsp;&nbsp;
+                                                            {list.access ? <i className="fa-solid fa-unlock-keyhole small"></i> : <i className="fa-solid fa-lock small"></i>}
+                                                        </p>
+                                                        <Dropdown>
+                                                            <Dropdown.Toggle variant="light" className="border-0">
+                                                                <i className="fa-solid fa-ellipsis"></i>
+                                                            </Dropdown.Toggle>
+                                                            <Dropdown.Menu>
+                                                                <Dropdown.Item>Copy link</Dropdown.Item>
+                                                                <Dropdown.Item>Edit list info</Dropdown.Item>
+                                                            </Dropdown.Menu>
+                                                        </Dropdown>
+                                                    </div>
+                                                </CardBody>
+                                            </div>
+                                            <div className="col-md-4">
+                                                <img src="https://i.postimg.cc/zXyh46b7/dd.jpg" alt="img list" className="img-fluid h-100 w-100" style={{ objectFit: 'cover' }} />
                                             </div>
                                         </div>
-                                    </div>
-                                    <hr className="my-5" />
-                                    <div>
-                                        <h4 className="mb-0">Personal Details</h4>
-                                        <p className="mb-4">Edit your personal information and address.</p>
-                                        {/* Form */}
-                                        <div className="row gx-3">
-                                            {/* First name */}
-                                            <div className="mb-3 col-12 col-md-12">
-                                                <label className="form-label" htmlFor="fname">
-                                                    Full Name
-                                                </label>
-                                                <input type="text" id="fname" className="form-control" placeholder="First Name" required="" onChange={handleProfileChange} name="full_name" value={profileData?.full_name} />
-                                                <div className="invalid-feedback">Please enter first name.</div>
-                                            </div>
-                                            {/* Last name */}
-                                            <div className="mb-3 col-12 col-md-12">
-                                                <label className="form-label" htmlFor="lname">
-                                                    About Me
-                                                </label>
-                                                <textarea onChange={handleProfileChange} name="about" id="" cols="30" value={profileData?.about} rows="5" className="form-control"></textarea>
-                                            </div>
-                                            {/* Country */}
-                                            <div className="mb-3 col-12 col-md-12">
-                                                <label className="form-label" htmlFor="editCountry">
-                                                    Bio
-                                                </label>
-                                                <input type="text" id="bio" className="form-control" placeholder="Country" required="" value={profileData?.bio} onChange={handleProfileChange} name="bio" />
-                                                <div className="invalid-feedback">Please choose country.</div>
-                                            </div>
-                                            {/* Country */}
-                                            <div className="mb-3 col-12 col-md-12">
-                                                <label className="form-label" htmlFor="editCountry">
-                                                    Country
-                                                </label>
-                                                <input type="text" id="country" className="form-control" placeholder="Country" required="" value={profileData?.country} onChange={handleProfileChange} name="country" />
-                                                <div className="invalid-feedback">Please choose country.</div>
-                                            </div>
-                                            {/* Country */}
-                                            <div className="mb-3 col-12 col-md-12">
-                                                <label className="form-label" htmlFor="editCountry">
-                                                    Facebook
-                                                </label>
-                                                <input type="text" id="facebook" className="form-control" placeholder="Country" required="" value={profileData?.facebook} onChange={handleProfileChange} name="facebook" />
-                                            </div>
-                                            {/* Country */}
-                                            <div className="mb-3 col-12 col-md-12">
-                                                <label className="form-label" htmlFor="editCountry">
-                                                    Twitter
-                                                </label>
-                                                <input type="text" id="twitter" className="form-control" placeholder="Country" required="" value={profileData?.twitter} onChange={handleProfileChange} name="twitter" />
-                                            </div>
-                                            <div className="col-12">
-                                                {/* Button */}
-                                                <button className="btn btn-primary" type="submit">
-                                                    Update Profile <i className="fas fa-check-circle"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </form>
+                                    </Card>
+
+                                ))}
                             </div>
+                        </Tab>
+                        <Tab eventKey="about" title="About">
+                            <div className="pt-5 vh-100">
+                                <div className="text-center small m-auto col-8 text-muted">
+                                    <h5 style={{ fontWeight: "bold" }}>Tell the world about yourself</h5>
+                                    <p className="text-center">Here’s where you can share more about yourself: your history, work experience, accomplishments, interests, dreams, and more. You can even add images and use rich text to personalize your bio.</p>
+                                    <Button variant="outline-secondary rounded-"> Get Started </Button>
+                                </div>
+                            </div>
+                        </Tab>
+                    </Tabs>
+                </div>
+
+                {/* Segunda columna */}
+                <div className="col-lg-4 ps-5">
+                    <div className="position-sticky" style={{ top: "2rem" }}>
+                        <div className="mb-4">
+                            <img
+                                src={profileData?.image}
+                                alt="Profile"
+                                className="rounded-circle mb-3"
+                                style={{
+                                    width: "95px",
+                                    height: "95px",
+                                    objectFit: "cover"
+                                }}
+                            />
+                            <h4 className="mb-2 fs-6" style={{ fontWeight: "bold" }}>{profileData.full_name}</h4>
+                            <p className="text-muted mb-3">
+                                {(profileData.followers ? profileData.followers.length : 0)} Followers · {(profileData.following ? profileData.following.length : 0)} Following 
+                            </p>
+                            <div className="mb-4">
+                                {profileData.bio && (
+                                    <p className="mb-3">{profileData.bio}</p>
+                                )}
+                                {profileData.country && (
+                                    <p className="text-muted mb-2">
+                                        <small>{profileData.country}</small>
+                                    </p>
+                                )}
+                            </div>
+                            <span
+                                style={{ color: 'limegreen', cursor: 'pointer' }}
+                                onClick={handleShowModal}
+                            >
+                                Edit Profile
+                            </span>
                         </div>
                     </div>
                 </div>
-            </section>
-        </>
+            </div>
+
+            <EditProfileModal
+                show={showEditModal}
+                handleClose={handleCloseModal}
+                userId={userId}
+                currentProfile={profileData}
+                onProfileUpdate={handleProfileUpdate}
+            />
+        </div>
     );
 }
 

@@ -122,18 +122,67 @@ header {
   background-color: rgba(0,0,0,0.02);
 }
 
-.btn-icon {
-  width: 32px;
-  height: 32px;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
+
+/*****/
+
+/* Agrega estos estilos en tu archivo CSS */
+
+/* Estilos para los tabs */
+
+.nav-tabs .nav-link {
+  position: relative;
+  border: none;
+  padding: 1rem 0.5rem;
+  margin-right: 1.5rem;
+  font-weight: 400;
+  color: #6c757d;
+  transition: color 0.2s ease;
 }
 
-.empty-state {
-  text-align: center;
-  padding: 2rem;
-  color: #6c757d;
+.nav-tabs .nav-link:hover {
+  color: #000;
+}
+
+.nav-tabs .nav-link.active {
+  font-weight: 500;
+  color: #000;
+}
+
+.nav-tabs .nav-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #000;
+}
+/*! PENDIENTE A ELIMINAR: Representan las cards de la seccion home de perfil, son de prueba*/
+
+
+/* Estilos para los botones */
+.btn-outline-dark {
+  border-color: #e6e6e6;
+}
+
+.btn-outline-dark:hover {
+  background-color: #f8f9fa;
+  border-color: #000;
+  color: #000;
+}
+
+/* Estilos para el dropdown */
+.dropdown-toggle::after {
+  display: none;
+}
+
+.dropdown-menu {
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border: 1px solid #eee;
+}
+
+.dropdown-item {
+  font-size: 0.9rem;
+  padding: 0.5rem 1rem;
 }

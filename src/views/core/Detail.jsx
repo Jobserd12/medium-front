@@ -19,7 +19,7 @@ function Detail() {
   });
 
   const param = useParams();
-  const MINIMUM_TIME_ON_PAGE = 5000; // 5 segundos
+  const MINIMUM_TIME_ON_PAGE = 5000;
 
   const fetchPost = async () => {
     try {
