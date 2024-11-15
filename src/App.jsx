@@ -17,7 +17,6 @@ import AddPost from "./views/dashboard/AddPost";
 import EditPost from "./views/dashboard/EditPost";
 import Comments from "./views/dashboard/Comments";
 import Notifications from "./views/dashboard/Notifications";
-import Profile from "./views/dashboard/Profile";
 import ErrorBoundary from "./utils/ErrorBoundary ";
 import MainWrapper from "./layouts/MainWrapper";
 import PrivateRoute from "./layouts/PrivateRoute";
@@ -26,6 +25,7 @@ import ErrorPage from "./views/pages/ErrorPage";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import LIbrary from "./views/dashboard/LIbrary";
 import Stats from "./views/dashboard/Stats";
+import ProfileLayout from "./views/dashboard/ProfileLayout";
 
 const queryClient = new QueryClient();
 
@@ -52,9 +52,9 @@ function App() {
                 <Route path="/forgot-password/" element={<ForgotPassword />} />
                 <Route path="/create-password/" element={<CreatePassword />} />
 
+                <Route path="/profile/:username" element={<ProfileLayout />} />
                 {/* Dashboard */}
                 <Route element={<PrivateRoute />}>
-                  <Route path="/profile/" element={<Profile />} />
                   <Route path="/library/" element={<LIbrary />} />
                   <Route path="/stats/" element={<Stats />} />
 

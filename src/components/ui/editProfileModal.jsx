@@ -3,7 +3,7 @@ import { Modal, Button, Form, Row, Col } from "react-bootstrap";
 import apiInstance from "../../utils/axios";
 import Toast from "../../plugin/Toast";
 
-function EditProfileModal({ show, handleClose, userId, currentProfile, onProfileUpdate }) {
+function EditProfileModal({ show, handleClose, username, currentProfile, onProfileUpdate }) {
     const [profileData, setProfileData] = useState({
         image: null,
         full_name: "",
@@ -80,7 +80,7 @@ function EditProfileModal({ show, handleClose, userId, currentProfile, onProfile
         formData.append("country", profileData.country);
 
         try {
-            const res = await apiInstance.patch(`user/profile/${userId}/`, formData, {
+            const res = await apiInstance.patch(`user/profile/${username}/`, formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },

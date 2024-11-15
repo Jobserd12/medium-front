@@ -1,11 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import { Button, Tabs, Tab, Dropdown, Card, CardBody } from "react-bootstrap";
-import apiInstance from "../../utils/axios";
-import useUserData from "../../plugin/useUserData";
-import Toast from "../../plugin/Toast";
-import { fetchProfileAPI } from "../../api/user";
-import EditProfileModal from "../../components/ui/editProfileModal";
 
 // Datos ficticios para las listas guardadas
 const savedLists = [
@@ -32,53 +26,29 @@ const savedLists = [
     }
 ];
 
-function Profile() {
-    const [profileData, setProfileData] = useState({
-        image: null,
-        full_name: "",
-        about: "",
-        bio: "",
-        facebook: "",
-        twitter: "",
-        country: "",
-        followers: [],
-        following: []
-    });
-    const [showEditModal, setShowEditModal] = useState(false);
+function Profile({ profileData, isOwnProfile, handleShowModal }) {
     const [activeTab, setActiveTab] = useState('home');
-    const userId = useUserData()?.user_id;
 
-    const handleShowModal = () => setShowEditModal(true);
-    const handleCloseModal = () => setShowEditModal(false);
+    const defaultProfileData = {
+        full_name: profileData?.full_name || 'User',
+        image: profileData?.image || '/default-avatar.png',
+        bio: profileData?.bio || '',
+        country: profileData?.country || '',
+        followers: profileData?.followers || [],
+        following: profileData?.following || []
+    };
     
-    const handleProfileUpdate = (updatedProfile) => {
-        setProfileData(updatedProfile);
-        fetchProfile();
-    };
-
-    const fetchProfile = async () => {
-        try {
-            const profileRes = await fetchProfileAPI(userId);
-            setProfileData(profileRes.data);
-        } catch (err) {
-            console.error("There was an error fetching the data!", err.response.data);
-        }
-    };
-
-    useEffect(() => {
-        fetchProfile();
-    }, [userId]);
-
     return (
         <div className="container-fluid py-4" style={{ maxWidth: "1200px" }}>
             <div className="row">
                 {/* Primera columna */}
                 <div className="col-lg-8">
                     <div className="d-flex justify-content-between align-items-center mb-4">
-                        <h1 className="h3 mb-0">{profileData.full_name}</h1>
+                        <h1 className="h3 mb-0">{defaultProfileData.full_name}
+                        </h1>
                         <Dropdown>
                             <Dropdown.Toggle variant="light" className="border-0">
-                                <i class="fa-solid fa-ellipsis-vertical"></i>
+                                <i className="fa-solid fa-ellipsis-vertical"></i>
                             </Dropdown.Toggle>
                             <Dropdown.Menu>
                                 <Dropdown.Item>Share Profile</Dropdown.Item>
@@ -102,7 +72,7 @@ function Profile() {
                                                 <CardBody>
                                                     <div className="mb-3">
                                                         <h5 style={{ letterSpacing: '-2px', fontWeight: 'bold', fontFamily: 'sans-serif' }}>{list.title}</h5>
-                                                        <spa className="small">Saved on {list.createAt}</spa>
+                                                        <span className="small">Saved on {list.createAt}</span>
                                                     </div>
                                                     <div className="d-flex align-items-center justify-content-between">
                                                         <p className="text-muted small mb-2">
@@ -147,7 +117,7 @@ function Profile() {
                     <div className="position-sticky" style={{ top: "2rem" }}>
                         <div className="mb-4">
                             <img
-                                src={profileData?.image}
+                                src={defaultProfileData.image}
                                 alt="Profile"
                                 className="rounded-circle mb-3"
                                 style={{
@@ -156,38 +126,34 @@ function Profile() {
                                     objectFit: "cover"
                                 }}
                             />
-                            <h4 className="mb-2 fs-6" style={{ fontWeight: "bold" }}>{profileData.full_name}</h4>
+                            <h4 className="mb-2 fs-6" style={{ fontWeight: "bold" }}>
+                                {defaultProfileData.full_name}
+                            </h4>
                             <p className="text-muted mb-3">
-                                {(profileData.followers ? profileData.followers.length : 0)} Followers · {(profileData.following ? profileData.following.length : 0)} Following 
+                                {defaultProfileData.followers.length} Followers · {defaultProfileData.following.length} Following 
                             </p>
                             <div className="mb-4">
-                                {profileData.bio && (
-                                    <p className="mb-3">{profileData.bio}</p>
+                                {defaultProfileData.bio && (
+                                    <p className="mb-3">{defaultProfileData.bio}</p>
                                 )}
-                                {profileData.country && (
+                                {defaultProfileData.country && (
                                     <p className="text-muted mb-2">
-                                        <small>{profileData.country}</small>
+                                        <small>{defaultProfileData.country}</small>
                                     </p>
                                 )}
                             </div>
-                            <span
-                                style={{ color: 'limegreen', cursor: 'pointer' }}
-                                onClick={handleShowModal}
-                            >
-                                Edit Profile
-                            </span>
+                            {isOwnProfile && (
+                                <span
+                                    style={{ color: 'limegreen', cursor: 'pointer' }}
+                                    onClick={handleShowModal}
+                                >
+                                    Edit Profile
+                                </span>
+                            )}
                         </div>
                     </div>
                 </div>
             </div>
-
-            <EditProfileModal
-                show={showEditModal}
-                handleClose={handleCloseModal}
-                userId={userId}
-                currentProfile={profileData}
-                onProfileUpdate={handleProfileUpdate}
-            />
         </div>
     );
 }

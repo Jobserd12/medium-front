@@ -3,29 +3,22 @@ import { Dropdown, Image } from "react-bootstrap";
 import { useAuthStore } from "../../store/auth";
 import useUserData from "../../plugin/useUserData";
 import apiInstance from "../../utils/axios";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 const UserProfile = () => {
-  const [profileData, setProfileData] = useState({
-    image: null,
-    full_name: "",
-    about: "",
-    bio: "",
-    facebook: "",
-    twitter: "",
-    country: "",
-  });
-  const userId = useUserData()?.user_id;
+  const [profileData, setProfileData] = useState({ image: null });
+  const username = useUserData()?.username;
   const [imagePreview, setImagePreview] = useState("");
   const location = useLocation();
 
   const fetchProfile = () => {
-    apiInstance.get(`user/profile/${userId}/`).then((res) => {
+    apiInstance.get(`user/profile/${username}/`).then((res) => {
       setProfileData(res.data);
     });
   };
 
   useEffect(() => {
+    console.log(profileData)
     fetchProfile();
   }, []);
   
@@ -49,32 +42,33 @@ const UserProfile = () => {
       </Dropdown.Toggle>
 
         <Dropdown.Menu> 
-            <Dropdown.Item href="/profile" className="d-flex align-items-center gap-3"> 
-                <i className={isActive("/profile") ? "fas fa-user " : "fa-regular fa-user"}></i> <span>Perfil</span> 
-            </Dropdown.Item> 
-            <Dropdown.Item href="/library" className="d-flex align-items-center gap-3"> 
+            <Link to={`/profile/@${username}`} className="dropdown-item d-flex align-items-center gap-3">
+                <i className={isActive("/profile/@:") ? "fas fa-user " : "fa-regular fa-user"}></i>
+                <span>Profile</span>
+            </Link>
+            <Link to="/library" className="dropdown-item d-flex align-items-center gap-3"> 
                 <i className={isActive("/library") ? "fas fa-bookmark " : "fa-regular fa-bookmark"}></i> 
                 <span>Librería</span> 
-            </Dropdown.Item> 
-            <Dropdown.Item href="/posts" className="d-flex align-items-center gap-3"> 
+            </Link> 
+            <Link to="/posts" className="dropdown-item d-flex align-items-center gap-3"> 
                 <i className={isActive("/posts") ? "fa fa-newspaper" : "fa-regular fa-newspaper"}></i> 
                 <span>Pots</span> 
-            </Dropdown.Item> 
-            <Dropdown.Item href="/stats" className="d-flex align-items-center gap-3"> 
+            </Link> 
+            <Link to="/stats" className="dropdown-item d-flex align-items-center gap-3"> 
                 <i className={isActive("/stats") ? "fa fa-star" : "fa-regular fa-star"}></i> 
                 <span>Stats</span> 
-            </Dropdown.Item> 
+            </Link> 
             <Dropdown.Divider /> 
-                <Dropdown.Item href="/settings" className="d-flex align-items-center gap-3"> <span>Configuración</span> 
-            </Dropdown.Item> 
-            <Dropdown.Item href="/help" className="d-flex align-items-center gap-3"> 
+                <Link to="/settings" className="dropdown-item d-flex align-items-center gap-3"> <span>Configuración</span> 
+            </Link> 
+            <Link to="/help" className="dropdown-item d-flex align-items-center gap-3"> 
                 <span>Ayuda</span> 
-            </Dropdown.Item> 
+            </Link> 
             <Dropdown.Divider /> 
-            <Dropdown.Item href="/logout" className="d-flex align-items-center gap-3"> 
+            <Link to="/logout" className="dropdown-item d-flex align-items-center gap-3"> 
                 <i className="fas fa-sign-out-alt"></i> 
                 <span>Sign Out</span> 
-            </Dropdown.Item> 
+            </Link> 
         </Dropdown.Menu> 
     </Dropdown>
   );
