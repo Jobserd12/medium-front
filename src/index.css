@@ -157,6 +157,16 @@ header {
   height: 2px;
   background-color: #000;
 }
+
+
+.link-hover {
+  text-decoration: none;
+}
+
+.link-hover:hover {
+  text-decoration: underline !important;
+}
+
 /*! PENDIENTE A ELIMINAR: Representan las cards de la seccion home de perfil, son de prueba*/
 
 

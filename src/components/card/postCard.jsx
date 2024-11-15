@@ -30,7 +30,7 @@ function PostCard({ post }) {
   
 
     const navigateToDetail = () => {
-        navigate(`/post/${post.slug}`);
+        navigate(`/post/${post.slug}`); 
     };
 
     const hasBookmark = post.bookmarks?.some(bookmark => bookmark.user.id === userData?.user_id);
@@ -56,11 +56,11 @@ function PostCard({ post }) {
                 <div className="card-footer mt-4">
                     <div className="d-flex justify-content-between align-items-center">
                         <div className="d-flex align-items-center gap-2">
-                            <a href="author.html" style={{ width: "30px", height: "30px", display: "flex", justifyContent: "center", alignItems: "center", overflow: "hidden", borderRadius: "20px", background: "red" }}>
+                            <Link to={`/profile/@${post.user.username}`} onClick={(e) => e.stopPropagation() } style={{ width: "30px", height: "30px", display: "flex", justifyContent: "center", alignItems: "center", overflow: "hidden", borderRadius: "20px", background: "red" }}>
                                 <img src={post.profile.image} alt="Sal" style={{ objectFit: "cover", width: "100%", height: "100%", borderRadius: "20px" }} />
-                            </a>
+                            </Link>
                             <div className="d-flex flex-column">
-                                <small><a href="author.html">{post.user.username}</a></small>
+                                <Link className="small text-dark link-hover" to={`/profile/@${post.user.username}`} onClick={(e) => e.stopPropagation() } >{post.user.username}</Link>
                                 <small>
                                     <time dateTime={moment(post.date).format("YYYY-MM-DD")}>
                                         {moment(post.date).format("DD MMM, YYYY")}
