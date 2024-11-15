@@ -18,14 +18,13 @@ function Detail() {
     comment: "",
   });
 
-  const param = useParams();
+  const { slug } = useParams();
   const MINIMUM_TIME_ON_PAGE = 5000;
 
   const fetchPost = async () => {
     try {
-      const response = await apiInstance.get(`post/detail/${param.slug}/`);
+      const response = await apiInstance.get(`post/detail/${slug}/`);
       setPost(response.data);
-      console.log(response.data);
       const tagArray = response.data?.tags?.split(",");
       setTags(tagArray);
     } catch(err) {
@@ -45,7 +44,7 @@ function Detail() {
 
   const incrementViewCount = async () => {
     try {
-      await apiInstance.post(`post/increment-view/${param.slug}/`);
+      await apiInstance.post(`post/increment-view/${slug}/`);
     } catch (error) {
       console.error("Error incrementando la vista:", error);
     }

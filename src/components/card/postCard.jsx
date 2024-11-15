@@ -30,7 +30,7 @@ function PostCard({ post }) {
   
 
     const navigateToDetail = () => {
-        navigate(`/${post.slug}`);
+        navigate(`/post/${post.slug}`);
     };
 
     const hasBookmark = post.bookmarks?.some(bookmark => bookmark.user.id === userData?.user_id);

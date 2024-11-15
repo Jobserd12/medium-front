@@ -31,7 +31,7 @@ function Profile({ profileData, isOwnProfile, handleShowModal }) {
 
     const defaultProfileData = {
         full_name: profileData?.full_name || 'User',
-        image: profileData?.image || '/default-avatar.png',
+        image: profileData?.image || 'default/default-user.jpg',
         bio: profileData?.bio || '',
         country: profileData?.country || '',
         followers: profileData?.followers || [],

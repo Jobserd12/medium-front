@@ -5,6 +5,7 @@ import useUserData from '../../plugin/useUserData';
 import EditProfileModal from '../../components/ui/editProfileModal';
 import Profile from '../../components/Profile';
 import { fetchProfileAPI } from '../../api/user';
+import NotFound from '../pages/NotFound';
 
 function ProfileLayout() {
     const { username } = useParams();
@@ -54,13 +55,10 @@ function ProfileLayout() {
         </div>;
     }
 
-    if (error) {
-        return <div className="alert alert-danger" role="alert">{error}</div>;
+    if (error || !profileData) {
+        return <NotFound />;
     }
 
-    if (!profileData) {
-        return <div className="alert alert-info" role="alert">Profile not found</div>;
-    }
 
     return (
         <>
