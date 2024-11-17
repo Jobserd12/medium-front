@@ -58,8 +58,8 @@ function App() {
                 <Route element={<PrivateRoute />}>
                   <Route path="/library" element={<LIbrary />} />
                   <Route path="/stats" element={<Stats />} />
-
                   <Route path="/logout" element={<Logout />} />
+
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/posts" element={<Posts />} />
                   <Route path="/add-post" element={<AddPost />} />

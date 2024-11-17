@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Button, Tabs, Tab, Dropdown, Card, CardBody } from "react-bootstrap";
+import { followToggleUserAPI, } from "../api/user";
+import Login from "../views/auth/Login";
 
 // Datos ficticios para las listas guardadas
 const savedLists = [
@@ -26,18 +28,60 @@ const savedLists = [
     }
 ];
 
-function Profile({ profileData, isOwnProfile, handleShowModal }) {
+function Profile({ profileData, isOwnProfile, handleShowModal, fetchProfile}) {
     const [activeTab, setActiveTab] = useState('home');
+    const [isLoading, setIsLoading] = useState(false);
+    const [isFollowing, setIsFollowing] = useState(false);
+    const [showLoginModal, setShowLoginModal] = useState(false);  
 
     const defaultProfileData = {
-        full_name: profileData?.full_name || 'User',
+        pk: profileData?.user || '',
+        full_name: profileData?.full_name || '',
         image: profileData?.image || 'default/default-user.jpg',
         bio: profileData?.bio || '',
         country: profileData?.country || '',
         followers: profileData?.followers || [],
         following: profileData?.following || []
     };
-    
+
+    useEffect(() => {
+        if (profileData?.followers?.includes(profileData?.currentUserUsername)) {
+            setIsFollowing(true);
+        }
+    }, []);
+
+
+    const followHandle = async () => {
+        if (!profileData.currentUserUsername) { 
+            setShowLoginModal(true);
+            return; 
+        } 
+        setIsLoading(true);
+        try {
+            const res = await followToggleUserAPI(defaultProfileData.pk);
+            fetchProfile();
+        } catch(err) {
+            console.error("Error al procesar la solicitud de follow:", err);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+    const getFollowButtonStyles = () => {
+        if (isFollowing) {
+            return {
+                backgroundColor: 'white',
+                border: '1px solid #32CD32',
+                color: '#32CD32',
+                borderRadius: '20px',
+            };
+        }
+        return {
+            backgroundColor: '#32CD32',
+            border: 'none',
+            color: 'white',
+            borderRadius: '20px',
+        };
+    };
     return (
         <div className="container-fluid py-4" style={{ maxWidth: "1200px" }}>
             <div className="row">
@@ -130,7 +174,7 @@ function Profile({ profileData, isOwnProfile, handleShowModal }) {
                                 {defaultProfileData.full_name}
                             </h4>
                             <p className="text-muted mb-3">
-                                {defaultProfileData.followers.length} Followers · {defaultProfileData.following.length} Following 
+                                {defaultProfileData.followers.length} Followers · {defaultProfileData.following.length} Following
                             </p>
                             <div className="mb-4">
                                 {defaultProfileData.bio && (
@@ -142,17 +186,26 @@ function Profile({ profileData, isOwnProfile, handleShowModal }) {
                                     </p>
                                 )}
                             </div>
-                            {isOwnProfile && (
+                            {isOwnProfile ? (
                                 <span
                                     style={{ color: 'limegreen', cursor: 'pointer' }}
                                     onClick={handleShowModal}
                                 >
                                     Edit Profile
                                 </span>
-                            )}
+                                ) : (
+                                    <Button
+                                    onClick={followHandle}
+                                    style={getFollowButtonStyles()}
+                                    disabled={isLoading}
+                                >
+                                    {isFollowing ? 'Following' : 'Follow'}
+                                </Button>
+                                )}
                         </div>
                     </div>
                 </div>
+                <Login show={showLoginModal} handleClose={() => setShowLoginModal(false)} />
             </div>
         </div>
     );

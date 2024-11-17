@@ -24,6 +24,15 @@ function Header() {
         navigate(`/search?query=${q}`);
     };
 
+    const handleWriteClick = () => { 
+        if (isLoggedIn && userData) { 
+            navigate('/write/'); 
+        } else { 
+            setShowLoginModal(true); 
+        } 
+    };
+
+
     useEffect(() => { 
         refetch();
     },[isLoggedIn, userData?.user_id]);
@@ -53,7 +62,7 @@ function Header() {
                         <div className="d-flex align-items-center justify-content-end ms-auto">
                             <ul className="navbar-nav align-items-center gap-4 ml-auto">
                                 <li className="nav-item">
-                                    <Link to="/write/" className={`nav-link text-black me-2 ${isActive('/write/')}`}>Write</Link>
+                                    <span onClick={handleWriteClick} className={`nav-link text-black me-2 ${isActive('/write/')}`} style={{ cursor: 'pointer' }}> Write </span>
                                 </li>
                                 {isLoggedIn ? (
                                     <>

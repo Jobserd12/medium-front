@@ -14,31 +14,35 @@ function ProfileLayout() {
     const [error, setError] = useState(null);
     const [showEditModal, setShowEditModal] = useState(false);
     const userData = useUserData();
-
+    
     const isOwnProfile = userData?.username === username.substring(1);
 
     const handleShowModal = () => setShowEditModal(true);
     const handleCloseModal = () => setShowEditModal(false);
 
-    const handleProfileUpdate = (updatedProfile) => {
-        console.log(updatedProfile)
-        setProfileData(updatedProfile);
-        fetchProfile();
-    };
-
+   
     const fetchProfile = async () => {
         setLoading(true);
         setError(null);
         try {
             const cleanUsername = username.substring(1);
             const profileRes = await fetchProfileAPI(cleanUsername);
-            setProfileData(profileRes.data);
+            const profileWithCurrentUser = {
+                ...profileRes.data,
+                currentUserUsername: userData?.username
+            };
+            setProfileData(profileWithCurrentUser);
         } catch (err) {
-            console.error('There was an error fetching the data!', err);
             setError('Error loading profile');
         } finally {
             setLoading(false);
         }
+    };
+
+
+    const handleProfileUpdate = (updatedProfile) => {
+        setProfileData(updatedProfile);
+        fetchProfile();
     };
 
     useEffect(() => {
@@ -66,6 +70,7 @@ function ProfileLayout() {
                 profileData={profileData}
                 isOwnProfile={isOwnProfile}
                 handleShowModal={handleShowModal}
+                fetchProfile={fetchProfile}
             />
             {isOwnProfile && (
                 <EditProfileModal
