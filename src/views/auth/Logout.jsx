@@ -1,42 +1,52 @@
-import React, { useEffect } from "react";
-import Header from "../partials/Header";
-import Footer from "../partials/Footer";
-import { Link } from "react-router-dom";
-import { logout } from "../../utils/auth";
+import React, { useEffect, useState } from 'react';
+import { logout } from '../../utils/auth';
+import Login from './Login';
 
-function Logout() {
-    useEffect(() => {
-        logout();
-    }, []);
+const LogoutPage = () => {
+    const [showLoginModal, setShowLoginModal] = useState(false)
 
-    return (
-        <>
-            <section className="container d-flex flex-column vh-100">
-                <div className="row align-items-center justify-content-center g-0 h-lg-100 py-8">
-                    <div className="col-lg-5 col-md-8 py-8 py-xl-0">
-                        <div className="card shadow bg-secondary">
-                            <div className="card-body p-6">
-                                <div className="mb-4">
-                                    <h3 className="mb-1 fw-bold">You have been logged out</h3>
-                                    <span>Thanks for visiing our website, come back anytime!</span>
-                                </div>
-                                <form className="needs-validation mt-3" noValidate="">
-                                    <div className="d-grid d-flex">
-                                        <Link to="/login/" className="btn btn-primary me-2 w-100">
-                                            Login <i className="fas fa-sign-in-alt"></i>
-                                        </Link>
-                                        <Link to="/register /" type="submit" className="btn btn-primary w-100">
-                                            Register <i className="fas fa-user-plus"></i>
-                                        </Link>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
+  useEffect(() => {
+    logout();
+  }, []);
+
+  return (
+    <div className="bg-light d-flex align-items-center">
+      <div className="container">
+        <div className="row justify-content-center">
+          <div className="col-11 col-md-10 col-lg-5">
+            <div className="card border-0 shadow-sm">
+              <div className="text-center mt-4">
+                <div className="mx-auto rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center" style={{ width: '80px', height: '80px' }}>
+                  <i className="fas fa-sign-out-alt fa-2x text-primary"></i>
                 </div>
-            </section>
-        </>
-    );
-}
+              </div>
+              
+              <div className="card-body text-center">
+                <h3 className="fw-bold mb-2">Session Closed</h3>
+                <p className="text-muted mb-4">
+                    Thank you for visiting our platform, we look forward to seeing you soon!
+                </p>
+                
+                <div className="d-grid gap-3">
+                  <span onClick={() => setShowLoginModal(true)} className="btn btn-secondary btn-lg position-relative">
+                    <i className="fas fa-sign-in-alt me-2"></i>
+                    Iniciar Sesión
+                  </span>
+                  <span className="btn btn-outline-secondary btn-lg position-relative"
+                  >
+                    <i className="fas fa-user-plus me-2"></i>
+                    Crear Cuenta
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <Login show={showLoginModal} handleClose={() => setShowLoginModal(false)} />
 
-export default Logout;
+    </div>
+  );
+};
+
+export default LogoutPage;
