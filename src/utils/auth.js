@@ -2,7 +2,6 @@
 import { useAuthStore } from "../store/auth";
 
 // Importing the axios library for making HTTP requests
-import axios from "./axios";
 
 // Importing jwt_decode to decode JSON Web Tokens
 import { jwtDecode } from "jwt-decode";
@@ -11,8 +10,10 @@ import Cookies from "js-cookie";
 
 // Importing Swal (SweetAlert2) for displaying toast notifications
 import Swal from "sweetalert2";
+import apiInstance from "./axios";
 
 // Configuring global toast notifications using Swal.mixin
+//! Sin usar
 const Toast = Swal.mixin({
     toast: true,
     position: "top",
@@ -25,7 +26,7 @@ const Toast = Swal.mixin({
 export const login = async (email, password) => {
     try {
         // Making a POST request to obtain user tokens
-        const { data, status } = await axios.post("user/token/", {
+        const { data, status } = await apiInstance.post("user/token/", {
             email,
             password,
         }); 
@@ -33,12 +34,9 @@ export const login = async (email, password) => {
         // If the request is successful (status code 200), set authentication user and display success toast
         if (status === 200) {
             setAuthUser(data.access, data.refresh);
+            location.href = '/';
             // Displaying a success toast notification
-            Toast.fire({
-                icon: "success",
-                title: "Signed in successfully",
-            });
-        } 
+        }
 
         // Returning data and error information
         return { data, error: null };
@@ -55,7 +53,7 @@ export const login = async (email, password) => {
 export const register = async (full_name, email, password, password2) => {
     try {
         // Making a POST request to register a new user
-        const { data } = await axios.post("user/register/", {
+        const { data } = await apiInstance.post("user/register/", {
             full_name,
             email,
             password,
@@ -64,12 +62,6 @@ export const register = async (full_name, email, password, password2) => {
 
         // Logging in the newly registered user and displaying success toast
         await login(email, password);
-
-        // Displaying a success toast notification
-        Toast.fire({
-            icon: "success",
-            title: "Signed Up Successfully",
-        });
 
         // Returning data and error information
         return { data, error: null };
@@ -88,12 +80,6 @@ export const logout = () => {
     Cookies.remove("access_token");
     Cookies.remove("refresh_token");
     useAuthStore.getState().setUser(null);
-
-    // Displaying a success toast notification
-    Toast.fire({
-        icon: "success",
-        title: "You have been logged out.",
-    });
 };
 
 // Function to set the authenticated user on page load
@@ -144,7 +130,7 @@ export const setAuthUser = (access_token, refresh_token) => {
 export const getRefreshToken = async () => {
     // Retrieving refresh token from cookies and making a POST request to refresh the access token
     const refresh_token = Cookies.get("refresh_token");
-    const response = await axios.post("user/token/refresh/", {
+    const response = await apiInstance.post("user/token/refresh/", {
         refresh: refresh_token,
     });
 
