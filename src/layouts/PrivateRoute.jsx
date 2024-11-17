@@ -5,7 +5,7 @@ const PrivateRoute = () => {
     // Use the 'useAuthStore' hook to check the user's authentication status. 
     const loggedIn = useAuthStore((state) => state.isLoggedIn)();
 
-    return loggedIn ? <Outlet /> : <Navigate to="/login" />;
+    return loggedIn ? <Outlet /> : <Navigate to="/" />;
 };
 
 export default PrivateRoute;
