@@ -25,8 +25,8 @@ import ErrorPage from "./views/pages/ErrorPage";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import LIbrary from "./views/dashboard/LIbrary";
 import Stats from "./views/dashboard/Stats";
-import ProfileLayout from "./views/dashboard/ProfileLayout";
 import NotFound from "./views/pages/NotFound";
+import ProfilePage from "./views/pages/ProfilePage";
 
 const queryClient = new QueryClient();
 
@@ -52,7 +52,7 @@ function App() {
 
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/create-password" element={<CreatePassword />} />
-                <Route path="/profile/:username" element={<ProfileLayout />} />
+                <Route path="/profile/:username" element={<ProfilePage />} />
 
                 {/* Dashboard */}
                 <Route element={<PrivateRoute />}>

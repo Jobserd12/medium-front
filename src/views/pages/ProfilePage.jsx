@@ -1,13 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import apiInstance from '../../utils/axios';
 import useUserData from '../../plugin/useUserData';
-import EditProfileModal from '../../components/ui/editProfileModal';
-import Profile from '../../components/Profile';
 import { fetchProfileAPI } from '../../api/user';
-import NotFound from '../pages/NotFound';
+import NotFound from './NotFound';
+import Profile from '../../components/profile/profile';
+import EditProfileModal from '../../components/profile/editProfileModal';
 
-function ProfileLayout() {
+function ProfilePage() {
     const { username } = useParams();
     const [profileData, setProfileData] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -85,4 +84,4 @@ function ProfileLayout() {
     );
 }
 
-export default ProfileLayout;
+export default ProfilePage;

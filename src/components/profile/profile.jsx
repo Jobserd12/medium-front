@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Button, Tabs, Tab, Dropdown, Card, CardBody } from "react-bootstrap";
-import { followToggleUserAPI, } from "../api/user";
-import Login from "../views/auth/Login";
+import { followToggleUserAPI, } from "../../api/user";
+import Login from "../../views/auth/Login";
 
 // Datos ficticios para las listas guardadas
 const savedLists = [
@@ -167,7 +167,8 @@ function Profile({ profileData, isOwnProfile, handleShowModal, fetchProfile}) {
                                 style={{
                                     width: "95px",
                                     height: "95px",
-                                    objectFit: "cover"
+                                    objectFit: "cover",
+                                    border: "2px solid #eee"
                                 }}
                             />
                             <h4 className="mb-2 fs-6" style={{ fontWeight: "bold" }}>

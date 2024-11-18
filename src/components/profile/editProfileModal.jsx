@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { Modal, Button, Form, Row, Col } from "react-bootstrap";
 import apiInstance from "../../utils/axios";
 import Toast from "../../plugin/Toast";
+import defaultUser from '../../assets/default-user.webp';
+import useUserData from "../../plugin/useUserData";
 
 function EditProfileModal({ show, handleClose, username, currentProfile, onProfileUpdate }) {
     const [profileData, setProfileData] = useState({
@@ -17,7 +19,7 @@ function EditProfileModal({ show, handleClose, username, currentProfile, onProfi
     const [imagePreview, setImagePreview] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const fileInputRef = useRef(null)
-    // Count caracters bio
+    const userData = useUserData()
     const [bio, setBio] = useState(profileData.bio || ''); 
 
     useEffect(() => {
@@ -66,12 +68,20 @@ function EditProfileModal({ show, handleClose, username, currentProfile, onProfi
         setIsLoading(true);
 
         const formData = new FormData();
-        
-        // Solo agregar la imagen si ha cambiado
-        if (profileData.image && typeof profileData.image !== 'string') {
-            formData.append("image", profileData.image);
-        }
-        
+        if (profileData.image) {
+            if (typeof profileData.image === 'string' && profileData.image.startsWith('http')) {
+              // No enviamos la imagen si es una URL (imagen existente)
+            } else if (profileData.image instanceof File) {
+              // Solo enviamos la imagen si es un archivo nuevo
+              formData.append("image", profileData.image);
+            }
+          } else {
+            // Si no hay imagen o es null, enviamos null explícitamente
+            formData.append("image", 'null');
+          }
+            
+        console.log("sss" , profileData.image)
+
         formData.append("full_name", profileData.full_name);
         formData.append("about", profileData.about);
         formData.append("bio", profileData.bio);
@@ -109,7 +119,7 @@ function EditProfileModal({ show, handleClose, username, currentProfile, onProfi
                         <div className="d-flex align-items-start gap-4">
                         <div>
                             <img
-                            src={imagePreview || profileData?.image}
+                            src={imagePreview || profileData?.image || defaultUser}
                             alt="Profile"
                             className="rounded-circle"
                             style={{
