@@ -66,22 +66,16 @@ function EditProfileModal({ show, handleClose, username, currentProfile, onProfi
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
-
         const formData = new FormData();
-        if (profileData.image) {
-            if (typeof profileData.image === 'string' && profileData.image.startsWith('http')) {
-              // No enviamos la imagen si es una URL (imagen existente)
-            } else if (profileData.image instanceof File) {
-              // Solo enviamos la imagen si es un archivo nuevo
-              formData.append("image", profileData.image);
-            }
-          } else {
-            // Si no hay imagen o es null, enviamos null explícitamente
-            formData.append("image", 'null');
-          }
-            
-        console.log("sss" , profileData.image)
 
+        const isImageChanged = profileData.image || profileData.image === null 
+
+        if (isImageChanged) {
+            formData.append("image", profileData.image);
+        } else {
+            formData.append("image", 'null');
+        }
+            
         formData.append("full_name", profileData.full_name);
         formData.append("about", profileData.about);
         formData.append("bio", profileData.bio);
@@ -95,6 +89,14 @@ function EditProfileModal({ show, handleClose, username, currentProfile, onProfi
                     "Content-Type": "multipart/form-data",
                 },
             });
+
+             // Dispatch evento personalizado solo si la imagen cambió
+            if (isImageChanged) {
+                window.dispatchEvent(new CustomEvent('profile-image-updated', {
+                detail: { newImageUrl: res.data.image }
+                }));
+            }
+
             Toast("success", "Profile updated successfully", "");
             onProfileUpdate(res.data);
             handleClose();

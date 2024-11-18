@@ -1,25 +1,38 @@
 import React, { useEffect, useState } from "react";
 import { Dropdown, Image } from "react-bootstrap";
-import { useAuthStore } from "../../store/auth";
 import useUserData from "../../plugin/useUserData";
-import apiInstance from "../../utils/axios";
 import { Link, useLocation } from "react-router-dom";
+import { fetchProfileAPI } from "../../api/user";
+import defaultUser from '../../assets/default-user.webp';
 
 const UserProfile = () => {
-  const [profileData, setProfileData] = useState({ image: null });
   const username = useUserData()?.username;
   const [imagePreview, setImagePreview] = useState("");
   const location = useLocation();
 
+  const updateHeaderImage = (newImageUrl) => {
+    setImagePreview(newImageUrl);
+  };
+
   const fetchProfile = () => {
-    apiInstance.get(`user/profile/${username}/`).then((res) => {
+    fetchProfileAPI(username).then((res) => {
       setProfileData(res.data);
+      setImagePreview(res.data.image)
     });
   };
 
   useEffect(() => {
-    console.log(profileData)
+    // Escuchar evento personalizado para actualización de imagen
+    window.addEventListener('profile-image-updated', (event) => {
+      updateHeaderImage(event.detail.newImageUrl);
+    });
+
     fetchProfile();
+
+    // Limpiar el event listener
+    return () => {
+      window.removeEventListener('profile-image-updated', updateHeaderImage);
+    };
   }, []);
   
   const isActive = (path) => location.pathname === path;
@@ -28,10 +41,9 @@ const UserProfile = () => {
     <Dropdown align="end">
         <Dropdown.Toggle variant="link" id="dropdown-basic" style={{ backgroundColor: 'transparent', border: 'none', padding: 0 }}>
         <Image
-          src={imagePreview || profileData?.image}
+          src={imagePreview || defaultUser }
           id="img-uploaded"
-          className="avatar-xl rounded-circle"
-          alt="avatar"
+          className="avatar-xl text-muted rounded-circle"
           style={{
             width: "50px",
             height: "50px",
