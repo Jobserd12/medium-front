@@ -12,7 +12,7 @@ function NotificationItem({ notification, onMarkSeen, onDelete, isSeen }) {
             Like: <i className="fa-solid fa-thumbs-up"></i>,
             Comment: <i className="fa-solid fa-comment"></i>,
             Bookmark: <i className="fa-solid fa-bookmark"></i>,
-            Follower: <i className="fa-solid fa-user-plus"></i>,
+            Follow: <i className="fa-solid fa-user-plus"></i>,
         };
         return icons[type] || null;
     };
@@ -22,12 +22,11 @@ function NotificationItem({ notification, onMarkSeen, onDelete, isSeen }) {
             Like: "liked your post",
             Comment: "commented on your post",
             Bookmark: "bookmarked your post",
-            Follower: "started following you"
+            Follow: "started following you"
         };
         return messages[type] || "";
     };
 
-    console.log(notification)
     return (
         <>
             <ListGroup.Item className="d-flex align-items-center justify-content-between p-3">
@@ -49,13 +48,18 @@ function NotificationItem({ notification, onMarkSeen, onDelete, isSeen }) {
                     </Link>
                 </div>
                 <div className="d-flex align-items-center">
-                    <span className="text-muted me-2 small">
+                    <span className="text-muted me-4 small">
                         {new Date(notification.date).toLocaleString()}
                     </span>
                     {isSeen ? (
-                        <Button variant="outline-danger" size="sm" onClick={() => setShowDeleteModal(true)} className="btn-icon" title="Delete notification">
-                            <i className="fa-solid fa-trash"></i>
-                        </Button>
+                        <>
+                            <Button variant="outline-danger" size="sm" onClick={() => setShowDeleteModal(true)} className="btn-icon" title="Delete notification">
+                                <i className="fa-solid fa-trash"></i>
+                            </Button> &nbsp;&nbsp;&nbsp;
+                            <Button variant="outline-primary" size="sm" onClick={() => onMarkSeen(notification.id)} className="btn-icon" title="Delete viewed">
+                                <i class="fa-solid fa-arrow-right-arrow-left"></i>
+                            </Button>
+                        </>
                     ) : (
                         <Button variant="outline-success" size="sm" onClick={() => onMarkSeen(notification.id)} className="btn-icon" title="Mark as read">
                             <i className="fa-solid fa-check"></i>

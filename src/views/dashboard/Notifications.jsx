@@ -20,8 +20,8 @@ function Notifications() {
 
   const handleMarkNotiAsSeen = async (notiId) => {
     try {
-      await markNotiAsSeenAPI(notiId);
-      Toast("success", "Marked as read", "");
+      const res = await markNotiAsSeenAPI(notiId);
+      Toast("success", res.data.message, "");
       await queryClient.invalidateQueries(["noti"]);
     } catch (err) {
       console.error('Error marking notification as seen:', err);
@@ -45,13 +45,6 @@ function Notifications() {
       <Container className="max-w-3xl mx-auto"> 
         <div className="d-flex justify-content-between align-items-center mb-4">
           <h2 className="m-0 text-2xl font-normal">Notifications</h2> 
-          <div className="d-flex gap-2">
-            {unreadNotifications.length > 0 && (
-              <span className="text-sm text-danger"> 
-                {unreadNotifications.length} new
-              </span>
-            )}
-          </div>
         </div>
 
         <div className="border-bottom mb-4"> 
