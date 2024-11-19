@@ -27,6 +27,7 @@ import LIbrary from "./views/dashboard/LIbrary";
 import Stats from "./views/dashboard/Stats";
 import NotFound from "./views/pages/NotFound";
 import ProfilePage from "./views/pages/ProfilePage";
+import Editor from "./views/pages/Editor";
 
 const queryClient = new QueryClient();
 
@@ -60,8 +61,11 @@ function App() {
                   <Route path="/stats" element={<Stats />} />
                   <Route path="/logout" element={<Logout />} />
 
+                  
+                  <Route path="/write" element={<Editor />} />
+
                   <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/posts" element={<Posts />} />
+                  <Route path="/stories" element={<Posts />} />
                   <Route path="/add-post" element={<AddPost />} />
                   <Route path="/edit-post/:id" element={<EditPost />} />
                   <Route path="/comments" element={<Comments />} />

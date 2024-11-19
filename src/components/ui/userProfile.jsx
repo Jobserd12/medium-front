@@ -16,7 +16,6 @@ const UserProfile = () => {
 
   const fetchProfile = () => {
     fetchProfileAPI(username).then((res) => {
-      setProfileData(res.data);
       setImagePreview(res.data.image)
     });
   };
@@ -62,8 +61,8 @@ const UserProfile = () => {
                 <i className={isActive("/library") ? "fas fa-bookmark " : "fa-regular fa-bookmark"}></i> 
                 <span>Librería</span> 
             </Link> 
-            <Link to="/posts" className="dropdown-item d-flex align-items-center gap-3"> 
-                <i className={isActive("/posts") ? "fa fa-newspaper" : "fa-regular fa-newspaper"}></i> 
+            <Link to="/stories" className="dropdown-item d-flex align-items-center gap-3"> 
+                <i className={isActive("/stories") ? "fa fa-newspaper" : "fa-regular fa-newspaper"}></i> 
                 <span>Pots</span> 
             </Link> 
             <Link to="/stats" className="dropdown-item d-flex align-items-center gap-3"> 

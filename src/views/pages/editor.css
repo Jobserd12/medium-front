@@ -1,0 +1,287 @@
+/* Editor.css */
+.editor-wrapper {
+  min-height: 100vh;
+  background-color: #fff;
+}
+
+/* Navbar Styles */
+.editor-navbar {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 0.75rem 0;
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(10px);
+}
+
+.back-arrow {
+  color: #292929;
+  cursor: pointer;
+  font-size: 1.1rem;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.back-arrow:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.draft-status {
+  font-size: 0.9rem;
+  color: #757575;
+}
+
+.publish-button {
+  border-radius: 25px !important;
+  padding: 0.5rem 1.25rem !important;
+  font-size: 0.95rem !important;
+  font-weight: 500 !important;
+  border-color: #1a8917 !important;
+  color: #1a8917 !important;
+  transition: all 0.2s !important;
+}
+
+.publish-button:hover {
+  background-color: rgba(26, 137, 23, 0.1) !important;
+}
+
+/* Side Tools */
+.side-tools {
+  position: fixed;
+  left: 2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  z-index: 100;
+}
+
+.tool-button {
+  width: 40px !important;
+  height: 40px !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  background: white !important;
+  border: none !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  color: #292929 !important;
+  transition: all 0.2s !important;
+}
+
+.tool-button:hover {
+  background-color: #f8f8f8 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Editor Container */
+.editor-container {
+  padding-top: 2rem;
+  padding-bottom: 5rem;
+}
+
+/* Title Input */
+.title-wrapper {
+  margin-bottom: 2rem;
+  position: relative;
+  width: 100%;
+  display: block;
+}
+
+.title-input {
+  width: 100%;
+  font-family: Georgia, serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #292929;
+  border: none;
+  outline: none;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  white-space: pre-wrap !important;
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+  display: block;
+  min-height: 3.5rem;
+  resize: none;
+  overflow: hidden;
+}
+
+textarea.title-input {
+  height: auto;
+  overflow-y: hidden;
+}
+
+.title-input::placeholder {
+  color: #757575;
+}
+
+/* Editor Content */
+.editor-content-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+}
+
+.editor-content {
+  min-height: 70vh;
+  outline: none;
+  font-family: Georgia, serif;
+  font-size: 1.25rem;
+  line-height: 1.8;
+  color: #292929;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  width: 100%;
+  display: block;
+}
+
+.content-placeholder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: #757575;
+  pointer-events: none;
+  font-family: Georgia, serif;
+  font-size: 1.25rem;
+}
+
+/* Asegurar que el contenido editable mantenga el formato */
+[contenteditable="true"] {
+  white-space: pre-wrap !important;
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+  -webkit-line-break: after-white-space;
+  width: 100%;
+  display: block;
+}
+
+/* Image Styles */
+.image-container {
+  margin: 2rem 0;
+  text-align: center;
+  max-width: 100%;
+}
+
+.editor-image {
+  max-width: 100%;
+  border-radius: 4px;
+  height: auto;
+}
+
+/* Video Container */
+.video-container {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  overflow: hidden;
+  margin: 2rem 0;
+  max-width: 100%;
+}
+
+.video-container iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: 4px;
+}
+
+/* Format Menu */
+.format-menu {
+  position: fixed;
+  z-index: 1000;
+  background: white;
+  border-radius: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 0.5rem;
+  display: flex;
+  gap: 0.25rem;
+  transform: translateX(-50%);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.format-button {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #292929;
+  transition: all 0.2s;
+}
+
+.format-button:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Typography Styles */
+.editor-content h1,
+.editor-content h2,
+.editor-content h3 {
+  font-family: Georgia, serif;
+  font-weight: 700;
+  color: #292929;
+  margin: 2rem 0 1rem;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.editor-content h2 {
+  font-size: 1.8rem;
+}
+
+.editor-content h3 {
+  font-size: 1.5rem;
+}
+
+.editor-content p {
+  margin-bottom: 1.5rem;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.editor-content blockquote {
+  border-left: 3px solid #292929;
+  margin-left: 0;
+  padding-left: 1.5rem;
+  font-style: italic;
+  color: #404040;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .side-tools {
+      position: fixed;
+      left: 1rem;
+      right: 1rem;
+      bottom: 1rem;
+      top: auto;
+      transform: none;
+      flex-direction: row;
+      justify-content: center;
+  }
+
+  .editor-container {
+      padding-top: 4rem;
+      padding-bottom: 6rem;
+  }
+
+  .title-input {
+      font-size: 2rem;
+  }
+}

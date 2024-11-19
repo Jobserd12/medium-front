@@ -26,7 +26,7 @@ function Header() {
 
     const handleWriteClick = () => { 
         if (isLoggedIn && userData) { 
-            navigate('/write/'); 
+            navigate('/write'); 
         } else { 
             setShowLoginModal(true); 
         } 
@@ -62,7 +62,7 @@ function Header() {
                         <div className="d-flex align-items-center justify-content-end ms-auto">
                             <ul className="navbar-nav align-items-center gap-4 ml-auto">
                                 <li className="nav-item">
-                                    <span onClick={handleWriteClick} className={`nav-link text-black me-2 ${isActive('/write/')}`} style={{ cursor: 'pointer' }}> Write </span>
+                                    <span onClick={handleWriteClick} className={`nav-link text-black me-2 ${isActive('/write')}`} style={{ cursor: 'pointer' }}> Write </span>
                                 </li>
                                 {isLoggedIn ? (
                                     <>
