@@ -29,11 +29,11 @@ function CategoryCard({ categories = [] }) {
         style={{ overflowX: "hidden", whiteSpace: "nowrap", scrollBehavior: "smooth" }}
       >
         {categories.length > 0 ? (
-          categories.map(({ slug, title }) => (
+          categories.map(({ slug, name }) => (
             <div className="d-inline-block" key={slug}>
               <Link to={`/category/${slug}/`} className="text-decoration-none">
                 <span className="px-3 py-2 text-black">
-                  {title}
+                  {name}
                 </span>
               </Link>
             </div>

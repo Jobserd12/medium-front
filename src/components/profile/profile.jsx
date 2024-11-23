@@ -37,7 +37,7 @@ function Profile({ profileData, isOwnProfile, handleShowModal, fetchProfile}) {
     const defaultProfileData = {
         pk: profileData?.user || '',
         full_name: profileData?.full_name || '',
-        image: profileData?.image || 'default/default-user.jpg',
+        image: profileData?.image || 'default/default-user.webp',
         bio: profileData?.bio || '',
         country: profileData?.country || '',
         followers: profileData?.followers || [],
@@ -86,19 +86,10 @@ function Profile({ profileData, isOwnProfile, handleShowModal, fetchProfile}) {
         <div className="container-fluid py-4" style={{ maxWidth: "1200px" }}>
             <div className="row">
                 {/* Primera columna */}
-                <div className="col-lg-8">
+                <div className="col-lg-9">
                     <div className="d-flex justify-content-between align-items-center mb-4">
                         <h1 className="h3 mb-0">{defaultProfileData.full_name}
                         </h1>
-                        <Dropdown>
-                            <Dropdown.Toggle variant="light" className="border-0">
-                                <i className="fa-solid fa-ellipsis-vertical"></i>
-                            </Dropdown.Toggle>
-                            <Dropdown.Menu>
-                                <Dropdown.Item>Share Profile</Dropdown.Item>
-                                <Dropdown.Item>Design Profile</Dropdown.Item>
-                            </Dropdown.Menu>
-                        </Dropdown>
                     </div>
 
                     {/* Tabs */}
@@ -107,8 +98,17 @@ function Profile({ profileData, isOwnProfile, handleShowModal, fetchProfile}) {
                         onSelect={(k) => setActiveTab(k)}
                         className="mb-4"
                     >
-                        <Tab eventKey="home" title="Home">
-                            <div className="py-3">
+                        <Tab eventKey="my-posts" title="My posts">
+                            <div className="pt-5 vh-100">
+                                <div className="text-center small m-auto col-8 text-muted">
+                                    <h5 style={{ fontWeight: "bold" }}>No post yet</h5>
+                                    <p className="text-center">Oops! It looks like there are no posts here yet. Why not break the ice and create the first one? Go ahead and share something amazing with everyone!</p>
+                                    <Button variant="outline-secondary rounded-">Start writing your first post</Button>
+                                </div>
+                            </div>
+                        </Tab>
+                        <Tab eventKey="Lists" title="Lists">
+                        <div className="py-3">
                                 {savedLists.map(list => (
                                     <Card key={list.id} className="border mb-3 shadow-md">
                                         <div className="row no-gutters">
@@ -144,65 +144,83 @@ function Profile({ profileData, isOwnProfile, handleShowModal, fetchProfile}) {
                                 ))}
                             </div>
                         </Tab>
-                        <Tab eventKey="about" title="About">
-                            <div className="pt-5 vh-100">
-                                <div className="text-center small m-auto col-8 text-muted">
-                                    <h5 style={{ fontWeight: "bold" }}>Tell the world about yourself</h5>
-                                    <p className="text-center">Here’s where you can share more about yourself: your history, work experience, accomplishments, interests, dreams, and more. You can even add images and use rich text to personalize your bio.</p>
-                                    <Button variant="outline-secondary rounded-"> Get Started </Button>
-                                </div>
-                            </div>
-                        </Tab>
                     </Tabs>
                 </div>
 
                 {/* Segunda columna */}
-                <div className="col-lg-4 ps-5">
+                <div className="col-lg-3 p-0">
                     <div className="position-sticky" style={{ top: "2rem" }}>
-                        <div className="mb-4">
-                            <img
-                                src={defaultProfileData.image}
-                                alt="Profile"
-                                className="rounded-circle mb-3"
-                                style={{
-                                    width: "95px",
-                                    height: "95px",
-                                    objectFit: "cover",
-                                    border: "2px solid #eee"
-                                }}
-                            />
-                            <h4 className="mb-2 fs-6" style={{ fontWeight: "bold" }}>
+                        <div className="mb-4 text-center">
+                            <div className="position-relative d-inline-block">
+                                <img
+                                    src={defaultProfileData.image}
+                                    alt="Profile"
+                                    className="rounded-circle mb-3"
+                                    style={{
+                                        width: "95px",
+                                        height: "95px",
+                                        objectFit: "cover",
+                                        border: "2px solid #eee"
+                                    }}
+                                />
+                                <Button     
+                                    variant="light" 
+                                    className="position-absolute bottom-0 end-0 p-1 rounded-circle"
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(window.location.href);
+                                    }}
+                                >
+                                    <i className="fas fa-link text-muted small"></i>
+                                </Button>
+                            </div>
+
+                            <h4 className="mb-2 fs-6 fw-bold">
                                 {defaultProfileData.full_name}
                             </h4>
                             <p className="text-muted mb-3">
                                 {defaultProfileData.followers.length} Followers · {defaultProfileData.following.length} Following
                             </p>
+
                             <div className="mb-4">
                                 {defaultProfileData.bio && (
-                                    <p className="mb-3">{defaultProfileData.bio}</p>
+                                    <div className="bio-container p-3 bg-light rounded">
+                                        <p className="mb-0 text-break" style={{ 
+                                            lineHeight: '1.6',
+                                            fontSize: '0.95rem',
+                                            maxWidth: '100%',
+                                            whiteSpace: 'pre-wrap',
+                                            wordWrap: 'break-word'
+                                        }}>
+                                            {defaultProfileData.bio}
+                                        </p>
+                                    </div>
                                 )}
                                 {defaultProfileData.country && (
                                     <p className="text-muted mb-2">
+                                        <i className="fas fa-map-marker-alt me-2"></i>
                                         <small>{defaultProfileData.country}</small>
                                     </p>
                                 )}
                             </div>
+
                             {isOwnProfile ? (
-                                <span
-                                    style={{ color: 'limegreen', cursor: 'pointer' }}
+                                <Button 
+                                    variant="outline-success" 
+                                    className="rounded-pill"
                                     onClick={handleShowModal}
                                 >
+                                    <i className="fas fa-edit me-2"></i>
                                     Edit Profile
-                                </span>
-                                ) : (
-                                    <Button
+                                </Button>
+                            ) : (
+                                <Button
                                     onClick={followHandle}
                                     style={getFollowButtonStyles()}
                                     disabled={isLoading}
                                 >
                                     {isFollowing ? 'Following' : 'Follow'}
                                 </Button>
-                                )}
+                            )}
                         </div>
                     </div>
                 </div>

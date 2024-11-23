@@ -18,7 +18,7 @@ const NotFound = () => {
         </h2>
 
         <p className="text-gray-600 text-xl mb-8">
-          Apparently even a page that doesn't exist.
+          It seems that the page does not exist, try reloading the site.
         </p>
 
         <Link

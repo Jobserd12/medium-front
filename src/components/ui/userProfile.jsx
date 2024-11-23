@@ -54,15 +54,11 @@ const UserProfile = () => {
 
         <Dropdown.Menu> 
             <Link to={`/profile/@${username}`} className="dropdown-item d-flex align-items-center gap-3">
-                <i className={isActive("/profile/@:") ? "fas fa-user " : "fa-regular fa-user"}></i>
+                <i className={isActive(`/profile/@${username}`) ? "fas fa-user " : "fa-regular fa-user"}></i>
                 <span>Profile</span>
             </Link>
-            <Link to="/library" className="dropdown-item d-flex align-items-center gap-3"> 
-                <i className={isActive("/library") ? "fas fa-bookmark " : "fa-regular fa-bookmark"}></i> 
-                <span>Librería</span> 
-            </Link> 
-            <Link to="/stories" className="dropdown-item d-flex align-items-center gap-3"> 
-                <i className={isActive("/stories") ? "fa fa-newspaper" : "fa-regular fa-newspaper"}></i> 
+            <Link to="/post" className="dropdown-item d-flex align-items-center gap-3"> 
+                <i className={isActive("/post") ? "fa fa-newspaper" : "fa-regular fa-newspaper"}></i> 
                 <span>Pots</span> 
             </Link> 
             <Link to="/stats" className="dropdown-item d-flex align-items-center gap-3"> 

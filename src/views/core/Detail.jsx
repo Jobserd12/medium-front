@@ -1,34 +1,37 @@
-import React, { useState, useEffect } from "react";
-import Header from "../partials/Header";
-import Footer from "../partials/Footer";
-import { Link, useParams } from "react-router-dom";
-
+import { useState, useEffect } from "react";
+import { Form, Button, Card, Image } from 'react-bootstrap';
+import { Link, Navigate, useParams } from "react-router-dom";
+import '../styles/post-content.css'
 import apiInstance from "../../utils/axios";
 import moment from "moment";
 import Toast from "../../plugin/Toast";
 import useUserData from "../../plugin/useUserData";
+import { useQueryClient } from "@tanstack/react-query";
+import { fetchPostsDetailAPI, handleBookmarkPostAPI, handleCommentPostAPI, handleLikePostAPI } from "../../api/posts";
+import Login from "../auth/Login";
 
 function Detail() {
   const [post, setPost] = useState([]);
   const [tags, setTags] = useState([]);
   const userData = useUserData();
+  const queryClient = useQueryClient();
+  const [showLoginModal, setShowLoginModal] = useState(false);
+
   const [createComment, setCreateComment] = useState({
-    full_name: "",
-    email: "",
     comment: "",
   });
-
   const { slug } = useParams();
   const MINIMUM_TIME_ON_PAGE = 5000;
 
   const fetchPost = async () => {
     try {
-      const response = await apiInstance.get(`post/detail/${slug}/`);
-      setPost(response.data);
-      const tagArray = response.data?.tags?.split(",");
+      const res = await fetchPostsDetailAPI(slug);
+      setPost(res.data);
+      console.log(res.data)
+      const tagArray = res.data?.tags?.split(",");
       setTags(tagArray);
     } catch(err) {
-      console.log(err)
+      Navigate("*")
     }
   };
 
@@ -59,47 +62,58 @@ function Detail() {
 
   const handleCreateCommentSubmit = async (e) => {
     e.preventDefault();
+    if (!userData) {
+      return setShowLoginModal(true)
+    }
     const jsonData = {
       post_id: post?.id,
-      name: createComment.full_name,
-      email: createComment.email,
+      name: post.profile.full_name,
+      email: post.user.email,
       comment: createComment.comment,
       user_id: userData?.user_id
     };
+    
+    try {
+      const res = await handleCommentPostAPI(jsonData);
+      fetchPost();
+      Toast("success", "Comment Posted.", "");
+      setCreateComment({
+        comment: "",
+      });
+    } catch(err) {
 
-    const response = await apiInstance.post(`post/comment-post/`, jsonData);
-    fetchPost();
-    Toast("success", "Comment Posted.", "");
-    setCreateComment({
-      full_name: "",
-      email: "",
-      comment: "",
-    });
+    }
   };
 
   const handleLikePost = async (postId) => {
       if (!userData) {
-          return Toast("error", "Authentication required", "Please log in to like posts.");
+          return setShowLoginModal(true)
       }
       const jsonData = { user_id: userData?.user_id, post_id: postId };
       try {
-          const res = await apiInstance.post("post/like-post/", jsonData);
+          const res = await handleLikePostAPI(jsonData);
           fetchPost();
-          Toast("success", res.data.message, "");
+          queryClient.invalidateQueries(['posts']);  
+          if (res.data.message) {
+            Toast("success", res.data.message, "");
+          }
       } catch (err) {
           console.error("Error liking post:", err);
       }
   };
-
+  
   const handleBookmarkPost = async (postId) => {
       if (!userData) {
-          return Toast("error", "Authentication required", "Please log in to bookmark posts.");
+        return setShowLoginModal(true)
       }
       const jsonData = { user_id: userData?.user_id, post_id: postId };
       try {
-          const res = await apiInstance.post("post/bookmark-post/", jsonData);
+          const res = await handleBookmarkPostAPI(jsonData);
+          queryClient.invalidateQueries(['posts']);  
           fetchPost();
-          Toast("success", res.data.message, "");
+          if (res.data.message) {
+            Toast("success", res.data.message, "");
+          }
       } catch (err) {
           console.error("Error bookmarking post:", err);
       }
@@ -109,43 +123,56 @@ function Detail() {
   const hasLiked = post.likes?.some(like => like.id === userData?.user_id);
   const hasBookmark = post.bookmarks?.some(bookmark => bookmark.user.id === userData?.user_id);
 
+  
   return (
     <>
       <section className="pt-4">
-        <div className="container position-relative" data-sticky-container="">
+      <style jsx>{` .btn-no-hover:hover { background-color: inherit !important; color: inherit !important; border-color: inherit !important; } `}</style>
+        <div className="container">
           <div className="row">
-      
-            <div className="col-lg-10 col-md-12 m-auto mb-2">
-                <ul className="list-inline list-unstyled d-flex flex-wrap gap-2 justify-content-around">
-                  <li className="list-inline-item my-lg-2 text-start">
-                    <i className="fas fa-calendar"></i>{" "}
-                    {moment(post.date).format("DD MMM, YYYY")}
-                  </li>
-                  <li className="list-inline-item my-lg-2 text-start">
-                    <i className="fas fa-eye me-1" /> {post.view} Visitas
-                  </li>
-                  <span className="mx-2 d-none d-md-block">|</span>
-                  <div className="w-100 d-block d-md-none"></div>
-                  <li className="list-inline-item my-lg-2 text-start">
-                    <button type="button" className="px-2" onClick={() => handleBookmarkPost(post.id)}>
-                      <i className={`fa-${hasBookmark ? "solid" : "regular"} fa-bookmark`} style={{ margin: "auto", color: "#000" }}></i>
-                        <small>{post.bookmarks?.length}</small> 
-                        <span className="ms-1">Favoritos</span> 
-                    </button>
-                  </li>
-                  <li className="list-inline-item my-lg-2 text-start">
-                    <button type="button" className="px-2" onClick={() => handleLikePost(post.id)} style={{ marginLeft: "7px"}}>
-                        <i className={hasLiked ? "fa-solid fa-thumbs-up" : "fa-regular fa-thumbs-up"} style={{ color: hasLiked ? "#5a63ee" : "gray", marginRight: "2px"}}></i>
-                        <small>{post.likes?.length}</small>
-                        <span className="ms-1">Likes</span> 
-                    </button>
-                  </li>
-                </ul>
+            <div className="col-lg-10 col-md-12 mx-auto mb-4">
+              <div className="d-flex flex-wrap justify-content-center align-items-center gap-3 text-muted">
+                <div className="d-flex align-items-center me-2">
+                  <i className="fas fa-calendar-alt  me-2"></i>
+                  <span className="small">{moment(post.date).format("DD MMM, YYYY")}</span>
+                </div>
+
+                <div className="d-flex align-items-center me-2">
+                  <i className="fas fa-eye text-secondary me-2"></i>
+                  <span className="small">{post.view} Visitas</span>
+                </div>
+
+                <button
+                  type="button"
+                  className="btn btn-sm btn-outline-secondary d-flex align-items-center btn-no-hover"
+                  onClick={() => handleBookmarkPost(post.id)}
+                >
+                  <i
+                    className={`fa-${hasBookmark ? "solid" : "regular"} fa-bookmark me-2`}
+                    style={{ color: hasBookmark ? "#6c757d" : "inherit" }}
+                  ></i>
+                  <span className="small">{post.bookmarks?.length} Favoritos</span>
+                </button>
+
+                <button
+                  type="button"
+                  className="btn btn-sm btn-outline-secondary d-flex align-items-center btn-no-hover"
+                  onClick={() => handleLikePost(post.id)}
+                >
+                  <i
+                    className={`${hasLiked ? "fa-solid" : "fa-regular"} fa-thumbs-up me-2`}
+                    style={{ color: hasLiked ? "#6c757d" : "inherit" }}
+                  ></i>
+                  <span className="small">{post.likes?.length} Likes</span>
+                </button>
               </div>
             </div>
+          </div>
             <h1 className="text-center">{post.title}</h1>
             <br />
-              <p>{post.description} </p>
+              <div className="post-content">
+                <div dangerouslySetInnerHTML={{ __html: post.content }} className="inline-content" />
+              </div>
               <ul className="list-inline text-primary-hover mt-0 mt-lg-3 text-start">
                   {tags?.map((t, index) => (
                     <li className="list-inline-item">
@@ -158,32 +185,31 @@ function Detail() {
                   </span>
                 </a>
               </ul>
-                
+              <br />
               <hr />
-              <div className="d-flex d-lg-none py-4">
-                <a href="#">
+              <div className="d-flex py-4 col-8">
+                <Link to={`/profile/@${post.user?.username}`} onClick={(e) => e.stopPropagation() } style={{ width: "120px", height: "120px", display: "flex", justifyContent: "center", alignItems: "center", overflow: "hidden", borderRadius: "20px" }}>
                   <div className="avatar avatar-xxl me-4">
                     <img
                       className="avatar-img rounded-circle"
                       src={post.profile?.image}
                       style={{
-                        width: "80px",
-                        height: "80px",
+                        width: "100%",
+                        height: "100%",
                         objectFit: "cover",
                         borderRadius: "50%",
                       }}
                       alt="perfil"
                     />
                   </div>
-                </a>
-                <div>
+                </Link>
+                <div className="">
                   <div className="d-sm-flex align-items-center justify-content-between">
                     <div>
                       <h4 className="m-0">{post.profile?.full_name}</h4>
                       <small>{post.profile?.bio}</small>
                     </div>
                   </div>
-                  <p className="my-1">{post.profile?.about}</p>
                   {/* Social */}
                   <ul className="nav">
                     {post.profile?.facebook !== null && (
@@ -211,71 +237,70 @@ function Detail() {
                   </ul>
                 </div>
               </div>
-
+              <hr />
+              <br />
               <div>
                 <h5>
                   <i className="fa-solid fa-comment-dots me-2"></i>
                   {post.comments?.length} Comentarios
                 </h5>
-              <div className="shadow-sm p-4 rounded shadow">
-                <form onSubmit={handleCreateCommentSubmit}>
-                  <div className="col-12">
-                    <textarea
-                      onChange={handleCreateCommentChange}
-                      name="comment"
-                      value={createComment.comment}
-                      className="form-control"
-                      rows={4}
-                      placeholder="Tu comentario aquí..."
-                      required
-                    />
-                  </div>
-                  <div className="col-12 d-flex justify-content-end mt-3">
-                    <button type="submit" className="btn btn-secondary">
-                      Comentar <i className="fas fa-paper-plane"></i>
-                    </button>
-                  </div>
-                </form>
-              </div>
-
-                {post.comments?.map((c, index) => (
-                  <div
-                    key={index}
-                    className="my-4 d-flex shadow p-3 mb-3 rounded"
-                  >
-                    <img
-                      className="avatar avatar-md rounded-circle float-start me-3"
-                      src={c.user_profile.image}
-                      style={{
-                        width: "70px",
-                        height: "70px",
-                        objectFit: "cover",
-                        borderRadius: "50%",
-                      }}
-                      alt="perfil"
-                    />
-                    <div className="w-100">
-                      <div className="col-12 mb-2 d-flex align-items-center justify-content-between">
-                        <h5 className="m-0">{c.name || "Anónimo"}</h5>
-                        <span className="me-3 small">
-                          {moment(c.date).format("DD MMM, YYYY")}
-                        </span>
-                      </div>
-                      <p className="fw-bold">{c.comment}</p>
-
-                      {c.reply !== null && (
-                        <div className="mt-2 bg-light p-2 rounded">
-                          <p className="m-0 fw-bold text-dark">
-                            <small>Respuesta:</small>
-                          </p>
-                          <p className="text-dark">{c.reply}</p>
-                        </div>
-                      )}
+                <div>
+            <Card className="shadow-sm p-4 mb-4 rounded">
+                <p> Feel free to leave a comment. The author will get back to you shortly. </p> 
+                <Form onSubmit={handleCreateCommentSubmit}>
+                    <Form.Group controlId="commentForm.ControlTextarea">
+                        <Form.Control
+                            as="textarea"
+                            rows={4}
+                            onChange={handleCreateCommentChange}
+                            name="comment"
+                            value={createComment.comment}
+                            placeholder="Your comment here..."
+                            required
+                        />
+                    </Form.Group>
+                    <div className="d-flex justify-content-end mt-3">
+                        <Button type="submit" variant="secondary" size="sm">
+                            Comment <i className="fas fa-paper-plane"></i>
+                        </Button>
                     </div>
-                  </div>
-                ))}
-              </div>
+                </Form>
+            </Card>
+
+            {post.comments?.map((c, index) => (
+                <Card key={index} className="mb-3 shadow-sm rounded">
+                    <Card.Body className="d-flex">
+                        <Image
+                            src={c.user_profile.image}
+                            roundedCircle
+                            fluid
+                            style={{ width: "50px", height: "50px", objectFit: "cover" }}
+                            alt="profile"
+                            className="me-3"
+                        />
+                        <div className="w-100">
+                            <div className="d-flex justify-content-between align-items-center mb-2">
+                                <strong>{c.name || "Anonymous"}</strong>
+                                <span className="text-muted small">{moment(c.date).format("DD MMM, YYYY")}</span>
+                            </div>
+                            <p className="mb-1">{c.comment}</p>
+                            {c.reply && (
+                                <Card className="mt-2 bg-light p-2 rounded">
+                                    <Card.Body>
+                                        <p className="mb-0 fw-bold text-dark">Reply:</p>
+                                        <p className="text-dark">{c.reply}</p>
+                                    </Card.Body>
+                                </Card>
+                            )}
+                        </div>
+                    </Card.Body>
+                </Card>
+            ))}
         </div>
+        </div>
+
+        </div>
+      <Login show={showLoginModal} handleClose={() => setShowLoginModal(false)} />
       </section>
     </>
   );

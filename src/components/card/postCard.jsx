@@ -1,18 +1,18 @@
 import { Link, useNavigate } from "react-router-dom";
 import moment from "moment";
-import './postCard.css';
 import { Tooltip, OverlayTrigger } from 'react-bootstrap'; 
 import useUserData from "../../plugin/useUserData";
 import apiInstance from "../../utils/axios";
 import Toast from "../../plugin/Toast";
-import usePostStore from "../../store/usePostStore";
 import { useQueryClient } from "@tanstack/react-query";
+import defaultImagePost from '../../assets/default-image-post.webp';
+import '../../views/styles/postCard.css';
 
 function PostCard({ post }) {
     const userData = useUserData();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
-
+    
     const handleBookmarkPost = async (postId) => {
         if (!userData) {
             return Toast("error", "Authentication required", "Please log in to bookmark posts.");
@@ -46,17 +46,17 @@ function PostCard({ post }) {
     return (
         <div className="col-sm-6 col-lg-4 mb-4">
             <div className="card shadow post-card user-select-auto" role="button" onClick={navigateToDetail}>
-                <div className="card-header p-0 border-0">
-                    <img className="card-img" src={post.image} alt={post.title} />
+                <div className="card-header p-0 border-0 m-0">
+                    <img className="card-img" src={post.image || defaultImagePost} alt={post.title} />
                 </div>
-                <div className="card-body p-3 max-h-md ">
+                <div className="card-body p-3" style={{ height: "150px" }}>
                     <h5 className="card-title">{post.title}</h5>
-                    <p className="small text-muted">{post.description}</p>
+                    <p className="small text-muted">{post.preview}</p>
                 </div>
                 <div className="card-footer mt-4">
                     <div className="d-flex justify-content-between align-items-center">
                         <div className="d-flex align-items-center gap-2">
-                            <Link to={`/profile/@${post.user.username}`} onClick={(e) => e.stopPropagation() } style={{ width: "30px", height: "30px", display: "flex", justifyContent: "center", alignItems: "center", overflow: "hidden", borderRadius: "20px", background: "red" }}>
+                            <Link to={`/profile/@${post.user.username}`} onClick={(e) => e.stopPropagation() } style={{ width: "30px", height: "30px", display: "flex", justifyContent: "center", alignItems: "center", overflow: "hidden", borderRadius: "20px" }}>
                                 <img src={post.profile.image} alt="Sal" style={{ objectFit: "cover", width: "100%", height: "100%", borderRadius: "20px" }} />
                             </Link>
                             <div className="d-flex flex-column">

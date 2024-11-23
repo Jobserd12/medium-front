@@ -9,7 +9,6 @@ function EditProfileModal({ show, handleClose, username, currentProfile, onProfi
     const [profileData, setProfileData] = useState({
         image: null,
         full_name: "",
-        about: "",
         bio: "",
         facebook: "",
         twitter: "",
@@ -63,6 +62,13 @@ function EditProfileModal({ show, handleClose, username, currentProfile, onProfi
         setImagePreview("");
     };
 
+    const capitalizeWords = (str) => {
+        if (!str) return '';
+        return str.split(' ')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+            .join(' ');
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
@@ -77,7 +83,6 @@ function EditProfileModal({ show, handleClose, username, currentProfile, onProfi
         }
             
         formData.append("full_name", profileData.full_name);
-        formData.append("about", profileData.about);
         formData.append("bio", profileData.bio);
         formData.append("facebook", profileData.facebook);
         formData.append("twitter", profileData.twitter);
@@ -90,7 +95,6 @@ function EditProfileModal({ show, handleClose, username, currentProfile, onProfi
                 },
             });
 
-             // Dispatch evento personalizado solo si la imagen cambió
             if (isImageChanged) {
                 window.dispatchEvent(new CustomEvent('profile-image-updated', {
                 detail: { newImageUrl: res.data.image }
@@ -109,42 +113,42 @@ function EditProfileModal({ show, handleClose, username, currentProfile, onProfi
     };
 
     return (
-        <Modal show={show} onHide={handleClose} size="md" centered>
-            <Modal.Header closeButton className="border-0 m-2">
-                <Modal.Title className="fs-5 text-center" style={{ fontWeight: "bold" }}>Profile Information</Modal.Title>
+        <Modal 
+            show={show} 
+            onHide={handleClose} 
+            size="lg" 
+            centered 
+            className="custom-profile-modal"
+        >
+            <Modal.Header 
+                closeButton 
+                className="border-0 p-4 pb-0"
+            >
+                <Modal.Title className="w-100 text-center fs-5 fw-bold text-dark">
+                    Edit Profile
+                </Modal.Title>
             </Modal.Header>
-            <Modal.Body className="p-4">
+            <Modal.Body className="p-4 pt-2">
                 <Form onSubmit={handleSubmit}>
                     {/* Profile Image Section */}
-                    <div className="mb-4">
-                        <p className="mb-3 small text-muted">Photo</p>
-                        <div className="d-flex align-items-start gap-4">
-                        <div>
-                            <img
+                    <div className="mb-4 d-flex align-items-center">
+                        <img
                             src={imagePreview || profileData?.image || defaultUser}
                             alt="Profile"
-                            className="rounded-circle"
+                            className="rounded-circle me-4 object-fit-cover"
                             style={{
-                                width: "80px",
-                                height: "80px",
-                                objectFit: "cover",
-                                border: "2px solid #eee"
+                                width: "80px", 
+                                height: "80px", 
+                                border: "2px solid #e0e0e0"
                             }}
-                            />
-                        </div>
-
-                        <div className="d-flex flex-column">
-                            <div className="mb-2 small d-flex gap-3">
+                        />
+                        <div>
+                            <div className="d-flex gap-3 mb-2">
                                 <label 
                                     htmlFor="photoUpload" 
-                                    style={{ 
-                                    color: '#2E7D32', 
-                                    cursor: 'pointer',
-                                    marginBottom: '8px',
-                                    display: 'block'
-                                    }}
+                                    className="text-success cursor-pointer"
                                 >
-                                    Update
+                                    Change Photo
                                 </label>
                                 <Form.Control
                                     type="file"
@@ -157,55 +161,37 @@ function EditProfileModal({ show, handleClose, username, currentProfile, onProfi
                                 />
                                 <span 
                                     onClick={handleDeleteImage}
-                                    style={{ 
-                                    color: '#D32F2F',
-                                    cursor: 'pointer'
-                                    }}
+                                    className="text-danger cursor-pointer"
                                 >
-                                    Delete
+                                    Remove
                                 </span>
                             </div>
-
-                            <small className="text-muted" style={{ fontSize: '12px', maxWidth: '250px' }}>
-                            Recommended: Square JPG, PNG, or GIF, at least 1,000 pixels per side.
+                            <small className="text-muted d-block" style={{ fontSize: '0.75rem', maxWidth: '250px' }}>
+                                Recommended: Square JPG, PNG, or GIF, at least 1,000 pixels per side.
                             </small>
-                        </div>
                         </div>
                     </div>
 
                     <Row className="g-3">
+                        {/* Full Name */}
                         <Col xs={12}>
                             <Form.Group>
-                                <Form.Label className="small">Full Name</Form.Label>
+                                <Form.Label className="small text-muted">Full Name</Form.Label>
                                 <Form.Control
                                     type="text"
                                     name="full_name"
-                                    value={profileData.full_name}
+                                    value={capitalizeWords(profileData.full_name)}
                                     onChange={handleProfileChange}
-                                    placeholder="Your full name"
+                                    placeholder="Enter your full name"
+                                    className="border-0 border-bottom rounded-0 px-0"
                                 />
                             </Form.Group>
                         </Col>
 
-                        {/* About */}
-                        <Col xs={12}>
-                            <Form.Group>
-                                <Form.Label className="small">About</Form.Label>
-                                <Form.Control
-                                    as="textarea"
-                                    name="about"
-                                    value={profileData.about}
-                                    onChange={handleProfileChange}
-                                    rows={3}
-                                    placeholder="Tell us about yourself"
-                                />
-                            </Form.Group>
-                        </Col>
-
-                        {/* Bio */}
+                        {/* Bio with Character Count */}
                         <Col xs={12}>
                             <Form.Group className="position-relative">
-                                <Form.Label className="small">Bio</Form.Label>
+                                <Form.Label className="small text-muted">Bio</Form.Label>
                                 <Form.Control
                                     as="textarea"
                                     name="bio"
@@ -213,82 +199,94 @@ function EditProfileModal({ show, handleClose, username, currentProfile, onProfi
                                     onChange={handleProfileChange}
                                     rows={3}
                                     maxLength={charLimit}
-                                    style={{ borderColor: bio.length === charLimit ? 'red' : '',resize: 'none' , boxShadow: 'none' }}
+                                    placeholder="Short bio (optional)"
+                                    className="border-0 border-bottom rounded-0 px-0 resize-none"
                                 />
-                                <div className="text-right small text-muted" style={{ position: 'absolute', right: '10px', bottom: '10px' }}>
-                                    <span style={{ fontWeight: "bold" }}>{bio.length}&nbsp;</span>/{charLimit}
+                                <div className="position-absolute bottom-0 end-0 text-muted small">
+                                    {profileData.bio.length}/{charLimit}
                                 </div>
                             </Form.Group>
-                            <style>
-                                {`
-                                    textarea:focus {
-                                        border-color: black !important;
-                                        box-shadow: none !important;
-                                    }
-                                `}
-                            </style>
                         </Col>
 
-                        {/* Country */}
+                        {/* Other Fields */}
                         <Col xs={12}>
                             <Form.Group>
-                                <Form.Label className="small">Country</Form.Label>
+                                <Form.Label className="small text-muted">Country</Form.Label>
                                 <Form.Control
                                     type="text"
                                     name="country"
                                     value={profileData.country}
                                     onChange={handleProfileChange}
+                                    placeholder="Your country"
+                                    className="border-0 border-bottom rounded-0 px-0"
                                 />
                             </Form.Group>
                         </Col>
 
-                        {/* Socials Media */}
+                        {/* Social Media */}
                         <Col xs={12} md={6}>
                             <Form.Group>
-                                <Form.Label className="small">Facebook</Form.Label>
+                                <Form.Label className="small text-muted">Facebook</Form.Label>
                                 <Form.Control
                                     type="text"
                                     name="facebook"
                                     value={profileData.facebook}
                                     onChange={handleProfileChange}
                                     placeholder="Facebook profile URL"
+                                    className="border-0 border-bottom rounded-0 px-0"
                                 />
                             </Form.Group>
                         </Col>
 
                         <Col xs={12} md={6}>
                             <Form.Group>
-                                <Form.Label className="small">Twitter</Form.Label>
+                                <Form.Label className="small text-muted">Twitter</Form.Label>
                                 <Form.Control
                                     type="text"
                                     name="twitter"
                                     value={profileData.twitter}
                                     onChange={handleProfileChange}
                                     placeholder="Twitter profile URL"
+                                    className="border-0 border-bottom rounded-0 px-0"
                                 />
                             </Form.Group>
                         </Col>
                     </Row>
                 </Form>
             </Modal.Body>
-            <Modal.Footer className="border-0">
+            <Modal.Footer className="border-0 p-4 pt-0">
                 <Button
+                    variant="outline-secondary"
                     onClick={handleClose}
-                    className="border-1 text-lime rounded-pill"
-                    style={{ borderColor: 'limegreen', color: 'limegreen', backgroundColor: 'transparent' }}
+                    className="rounded-pill px-4"
                 >
                     Cancel
                 </Button>
                 <Button
+                    variant="success"
                     onClick={handleSubmit}
                     disabled={isLoading}
-                    className="px-4 rounded-pill"
-                    style={{ backgroundColor: 'limegreen', color: 'white', borderColor: 'limegreen' }}
+                    className="rounded-pill px-4"
                 >
-                    {isLoading ? "Saving..." : "Save"}
+                    {isLoading ? "Saving..." : "Save Changes"}
                 </Button>
             </Modal.Footer>
 
+            <style jsx>{`
+                .custom-profile-modal .modal-content {
+                    border:0;
+                    box-shadow: 0 4px 6px rgba(0,0,0,0.5);
+                }
+                .cursor-pointer {
+                    cursor: pointer;
+                }
+                .resize-none {
+                    resize: none;
+                }
+                .object-fit-cover {
+                    object-fit: cover;
+                }
+            `}</style>
         </Modal>
     );
 }

@@ -26,7 +26,7 @@ function Header() {
 
     const handleWriteClick = () => { 
         if (isLoggedIn && userData) { 
-            navigate('/write'); 
+            navigate('/new-post'); 
         } else { 
             setShowLoginModal(true); 
         } 
@@ -62,7 +62,7 @@ function Header() {
                         <div className="d-flex align-items-center justify-content-end ms-auto">
                             <ul className="navbar-nav align-items-center gap-4 ml-auto">
                                 <li className="nav-item">
-                                    <span onClick={handleWriteClick} className={`nav-link text-black me-2 ${isActive('/write')}`} style={{ cursor: 'pointer' }}> Write </span>
+                                    <span onClick={handleWriteClick} className={`nav-link text-black me-2 ${isActive('/new-post')}`} style={{ cursor: 'pointer' }}>Publish</span>
                                 </li>
                                 {isLoggedIn ? (
                                     <>
@@ -71,9 +71,6 @@ function Header() {
                                                 <i className={isActive("/notifications") ? "fa-solid fa-bell" : "fa-regular fa-bell"}></i>
                                                 {unreadCount > 0 && ( <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary"> {unreadCount} </span> )}
                                             </Link>
-                                        </li>
-                                        <li className="nav-item">
-                                            <Link to="/dashboard/" className={`btn me-2 ${isActive('/dashboard/')}`}>Dashboard <i className="bi bi-grid-fill"></i></Link>
                                         </li>
                                         <li className="nav-item"> <UserProfile /> </li>
                                     </>

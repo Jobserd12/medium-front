@@ -26,7 +26,7 @@ function Search() {
       <section className="p-0">
         <div className="container">
           <h2 className="text-start d-block mt-1">
-            Resultados para "{query}"
+            Results for "{query}"
           </h2>
         </div>
       </section>

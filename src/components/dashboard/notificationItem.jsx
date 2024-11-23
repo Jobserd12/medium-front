@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { ListGroup, Button, Image } from "react-bootstrap";
 import MinimalModal from "../ui/minimalModal";
 import { Link } from "react-router-dom";
-import './notifications.style.css';
+import '../../views/styles/notifications.css';
 
 function NotificationItem({ notification, onMarkSeen, onDelete, isSeen }) {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
