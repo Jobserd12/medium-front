@@ -1,0 +1,225 @@
+  .help-center .container {
+    min-height: 100vh;
+    background-color: #f8f9fa;
+    font-family: 'Segoe UI', 'Roboto', sans-serif;
+  }
+  
+  .help-center .header {
+    background-color: #ffffff;
+  }
+  
+  .header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+  
+  .title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #1a1a1a;
+  }
+  
+  /* Estilos del buscador */
+  .search-section {
+    background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+    border-bottom: 1px solid #e5e7eb;
+    padding: 3rem 0;
+  }
+  
+  .search-container {
+    max-width: 700px;
+    margin: 0 auto;
+    position: relative;
+    padding: 0 2rem;
+  }
+  
+  .search-wrapper {
+    position: relative;
+    width: 100%;
+  }
+  
+  .search-box {
+    display: flex;
+    align-items: center;
+    background-color: #ffffff;
+    border: 2px solid #e5e7eb;
+    border-radius: 50px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .search-box:focus-within {
+    box-shadow: 0 6px 24px rgba(0,0,0,0.08);
+    border-color: #2563eb;
+  }
+  
+  .search-box:focus-within .search-icon {
+    color: #2563eb;
+  }
+  
+  .search-input {
+    width: 100%;
+    padding: 1.25rem 1.5rem 1.25rem 3.5rem;
+    border: none;
+    outline: none;
+    font-size: 1.1rem;
+    color: #1a1a1a;
+    background-color: transparent;
+    transition: all 0.3s ease;
+  }
+  
+  .search-icon {
+    position: absolute;
+    left: 1.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    font-size: 1.2rem;
+    transition: color 0.3s ease;
+  }
+  
+  .search-hint {
+    text-align: center;
+    color: #64748b;
+    font-size: 0.95rem;
+    margin-top: 1rem;
+  }
+  
+  .search-tags {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+  
+  .search-tag {
+    padding: 0.5rem 1rem;
+    background-color: #f1f5f9;
+    color: #475569;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    outline: none;
+  }
+  
+  .search-tag:hover {
+    background-color: #e2e8f0;
+    color: #2563eb;
+  }
+  
+  /* Estilos del contenido principal */
+  .main-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 3rem 1rem;
+  }
+  
+  .category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .category-card {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    transition: box-shadow 0.3s ease;
+    cursor: pointer;
+  }
+  
+  .category-card:hover {
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  }
+  
+  .card-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  
+  .icon-container {
+    padding: 0.5rem;
+    background-color: #f0f7ff;
+    border-radius: 8px;
+    margin-right: 1rem;
+  }
+  
+  .category-icon {
+    color: #2563eb;
+    font-size: 1.25rem;
+  }
+  
+  .category-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+  
+  .article-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .article-item {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0;
+    color: #4b5563;
+    transition: color 0.2s ease;
+  }
+  
+  .article-item:hover {
+    color: #2563eb;
+  }
+  
+  /* Estilos de la sección de soporte */
+  .support-section {
+    background-color: #f0f7ff;
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    margin-top: 3rem;
+  }
+  
+  .support-icon {
+    font-size: 2rem;
+    color: #2563eb;
+    margin-bottom: 1rem;
+  }
+  
+  .support-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #1a1a1a;
+    margin-bottom: 0.5rem;
+  }
+  
+  .support-text {
+    color: #4b5563;
+    margin-bottom: 1rem;
+  }
+  
+  .support-button {
+    background-color: #2563eb;
+    color: #ffffff;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    font-weight: 500;
+  }
+  
+  .support-button:hover {
+    background-color: #1d4ed8;
+  }
