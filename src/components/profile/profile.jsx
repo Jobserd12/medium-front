@@ -1,38 +1,41 @@
 import React, { useState, useEffect } from "react";
-import { Button, Tabs, Tab, Dropdown, Card, CardBody } from "react-bootstrap";
-import { followToggleUserAPI, } from "../../api/user";
+import { Button, Tabs, Tab, Card, Pagination } from "react-bootstrap";
 import Login from "../../views/auth/Login";
+import Posts from "./posts";
+import { followToggleUserAPI } from "../../api/user";
+import useUserData from "../../plugin/useUserData";
 
-// Datos ficticios para las listas guardadas
-const savedLists = [
+// Datos ficticios para demostración
+const likedPosts = [
     {
         id: 1,
-        title: "My Reading List",
-        createAt: "2024-03-15",
-        items: 12,
-        access: false
+        title: "Understanding Modern JavaScript",
+        author: "Sarah Chen",
+        date: "2024-03-15",
+        likes: 45,
+        bookmarked: true,
+        excerpt: "JavaScript has Lorem ipsum, dolor sit amet consectetur adipisicing elit. Temporibus, magnam.."
     },
     {
         id: 2,
-        title: "Tech Innovations",
-        createAt: "2024-03-10",
-        items: 8,
-        access: true
+        title: "Lorem ipsum, dolor sit amet consectetur adipisicing elit. Temporibus, magnam.",
+        author: "John Chen",
+        date: "2024-03-20",
+        likes: 45,
+        bookmarked: true,
+        excerpt: "JavaScriptLorem ipsum, dolor sit amet consectetur adipisicing elit. Temporibus, magnam. new features..."
     },
-    {
-        id: 3,
-        title: "Design Inspiration",
-        createAt: "2024-03-05",
-        items: 15,
-        access: false
-    }
 ];
 
-function Profile({ profileData, isOwnProfile, handleShowModal, fetchProfile}) {
-    const [activeTab, setActiveTab] = useState('home');
+
+function Profile({ profileData, isOwnProfile, handleShowModal, fetchProfile }) {
+    const [activeTab, setActiveTab] = useState('posts');
+    const [currentPage, setCurrentPage] = useState(1);
     const [isLoading, setIsLoading] = useState(false);
     const [isFollowing, setIsFollowing] = useState(false);
-    const [showLoginModal, setShowLoginModal] = useState(false);  
+    const [showLoginModal, setShowLoginModal] = useState(false);
+
+    const ITEMS_PER_PAGE = 5;
 
     const defaultProfileData = {
         pk: profileData?.user || '',
@@ -44,12 +47,93 @@ function Profile({ profileData, isOwnProfile, handleShowModal, fetchProfile}) {
         following: profileData?.following || []
     };
 
-    useEffect(() => {
-        if (profileData?.followers?.includes(profileData?.currentUserUsername)) {
-            setIsFollowing(true);
-        }
-    }, []);
+    const getPaginatedItems = (items) => {
+        const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+        return items.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+    };
 
+    const totalPages = (items) => Math.ceil(items.length / ITEMS_PER_PAGE);
+
+    const PaginationControl = ({ items }) => {
+        if (totalPages(items) <= 1) return null;
+
+        return (
+            <Pagination className="justify-content-center mt-4">
+                <Pagination.Prev 
+                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                    disabled={currentPage === 1}
+                />
+                {[...Array(totalPages(items))].map((_, idx) => (
+                    <Pagination.Item
+                        key={idx + 1}
+                        active={idx + 1 === currentPage}
+                        onClick={() => setCurrentPage(idx + 1)}
+                    >
+                        {idx + 1}
+                    </Pagination.Item>
+                ))}
+                <Pagination.Next 
+                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages(items)))}
+                    disabled={currentPage === totalPages(items)}
+                />
+            </Pagination>
+        );
+    };
+
+    // Componente para los posts con likes
+    const LikedPostsContent = () => (
+        <div className="py-4">
+            {getPaginatedItems(likedPosts).map(post => (
+                <Card key={post.id} className="border-0 mb-4">
+                    <Card.Body className="p-0">
+                        <div className="d-flex align-items-center mb-2">
+                            <small className="text-muted me-2">{post.author}</small>
+                            <small className="text-muted">· {post.date}</small>
+                        </div>
+                        <h5 className="mb-2" style={{ fontWeight: "700", letterSpacing: "-0.5px" }}>
+                            {post.title}
+                        </h5>
+                        <p className="text-muted mb-3" style={{ fontSize: "0.95rem" }}>
+                            {post.excerpt}
+                        </p>
+                        <div className="d-flex align-items-center">
+                            <Button variant="link" className="text-muted p-0 me-3">
+                                <i className="far fa-heart me-2"></i>
+                                {post.likes}
+                            </Button>
+                        </div>
+                    </Card.Body>
+                </Card>
+            ))}
+            <PaginationControl items={likedPosts} />
+        </div>
+    );
+
+    // Componente para los bookmarks
+    const BookmarksContent = () => (
+        <div className="py-4">
+            {getPaginatedItems(likedPosts.filter(post => post.bookmarked)).map(post => (
+                <Card key={post.id} className="border-0 mb-4">
+                    <Card.Body className="p-0">
+                        <div className="d-flex align-items-center mb-2">
+                            <small className="text-muted me-2">{post.author}</small>
+                            <small className="text-muted">· {post.date}</small>
+                        </div>
+                        <h5 className="mb-2" style={{ fontWeight: "700", letterSpacing: "-0.5px" }}>
+                            {post.title}
+                        </h5>
+                        <p className="text-muted mb-3" style={{ fontSize: "0.95rem" }}>
+                            {post.excerpt}
+                        </p>
+                        <Button variant="link" className="text-warning p-0">
+                            <i className="fas fa-bookmark"></i>
+                        </Button>
+                    </Card.Body>
+                </Card>
+            ))}
+            <PaginationControl items={likedPosts.filter(post => post.bookmarked)} />
+        </div>
+    );
 
     const followHandle = async () => {
         if (!profileData.currentUserUsername) { 
@@ -66,88 +150,61 @@ function Profile({ profileData, isOwnProfile, handleShowModal, fetchProfile}) {
             setIsLoading(false);
         }
     };
-    const getFollowButtonStyles = () => {
-        if (isFollowing) {
-            return {
-                backgroundColor: 'white',
-                border: '1px solid #32CD32',
-                color: '#32CD32',
-                borderRadius: '20px',
-            };
-        }
-        return {
-            backgroundColor: '#32CD32',
-            border: 'none',
-            color: 'white',
-            borderRadius: '20px',
-        };
-    };
+
     return (
         <div className="container-fluid py-4" style={{ maxWidth: "1200px" }}>
             <div className="row">
                 {/* Primera columna */}
                 <div className="col-lg-9">
                     <div className="d-flex justify-content-between align-items-center mb-4">
-                        <h1 className="h3 mb-0">{defaultProfileData.full_name}
-                        </h1>
+                        <h1 className="h3 mb-0">{defaultProfileData.full_name}</h1>
                     </div>
 
-                    {/* Tabs */}
                     <Tabs
                         activeKey={activeTab}
-                        onSelect={(k) => setActiveTab(k)}
-                        className="mb-4"
+                        onSelect={(k) => {
+                            setActiveTab(k);
+                            setCurrentPage(1); 
+                        }}
+                        className="mb-4 border-0"
                     >
-                        <Tab eventKey="my-posts" title="My posts">
-                            <div className="pt-5 vh-100">
-                                <div className="text-center small m-auto col-8 text-muted">
-                                    <h5 style={{ fontWeight: "bold" }}>No post yet</h5>
-                                    <p className="text-center">Oops! It looks like there are no posts here yet. Why not break the ice and create the first one? Go ahead and share something amazing with everyone!</p>
-                                    <Button variant="outline-secondary rounded-">Start writing your first post</Button>
-                                </div>
-                            </div>
+                        <Tab 
+                            eventKey="posts" 
+                            title={
+                                <span>
+                                    <i className="fa-regular fa-newspaper me-2"></i>
+                                    Post
+                                </span>
+                            }
+                        >
+                            <Posts />
                         </Tab>
-                        <Tab eventKey="Lists" title="Lists">
-                        <div className="py-3">
-                                {savedLists.map(list => (
-                                    <Card key={list.id} className="border mb-3 shadow-md">
-                                        <div className="row no-gutters">
-                                            <div className="col-md-8">
-                                                <CardBody>
-                                                    <div className="mb-3">
-                                                        <h5 style={{ letterSpacing: '-2px', fontWeight: 'bold', fontFamily: 'sans-serif' }}>{list.title}</h5>
-                                                        <span className="small">Saved on {list.createAt}</span>
-                                                    </div>
-                                                    <div className="d-flex align-items-center justify-content-between">
-                                                        <p className="text-muted small mb-2">
-                                                            {list.items} items &nbsp;&nbsp;&nbsp;
-                                                            {list.access ? <i className="fa-solid fa-unlock-keyhole small"></i> : <i className="fa-solid fa-lock small"></i>}
-                                                        </p>
-                                                        <Dropdown>
-                                                            <Dropdown.Toggle variant="light" className="border-0">
-                                                                <i className="fa-solid fa-ellipsis"></i>
-                                                            </Dropdown.Toggle>
-                                                            <Dropdown.Menu>
-                                                                <Dropdown.Item>Copy link</Dropdown.Item>
-                                                                <Dropdown.Item>Edit list info</Dropdown.Item>
-                                                            </Dropdown.Menu>
-                                                        </Dropdown>
-                                                    </div>
-                                                </CardBody>
-                                            </div>
-                                            <div className="col-md-4">
-                                                <img src="https://i.postimg.cc/zXyh46b7/dd.jpg" alt="img list" className="img-fluid h-100 w-100" style={{ objectFit: 'cover' }} />
-                                            </div>
-                                        </div>
-                                    </Card>
-
-                                ))}
-                            </div>
+                        <Tab 
+                            eventKey="likes" 
+                            title={
+                                <span>
+                                    <i className="far fa-heart me-2"></i>
+                                    Likes
+                                </span>
+                            }
+                        >
+                            <LikedPostsContent />
+                        </Tab>
+                        <Tab 
+                            eventKey="bookmarks" 
+                            title={
+                                <span>
+                                    <i className="far fa-bookmark me-2"></i>
+                                    Bookmarks
+                                </span>
+                            }
+                        >
+                            <BookmarksContent />
                         </Tab>
                     </Tabs>
                 </div>
 
-                {/* Segunda columna */}
+                {/* Segunda columna - Profile sidebar */}
                 <div className="col-lg-3 p-0">
                     <div className="position-sticky" style={{ top: "2rem" }}>
                         <div className="mb-4 text-center">
@@ -163,8 +220,8 @@ function Profile({ profileData, isOwnProfile, handleShowModal, fetchProfile}) {
                                         border: "2px solid #eee"
                                     }}
                                 />
-                                <Button     
-                                    variant="light" 
+                                <Button
+                                    variant="light"
                                     className="position-absolute bottom-0 end-0 p-1 rounded-circle"
                                     onClick={() => {
                                         navigator.clipboard.writeText(window.location.href);
@@ -184,7 +241,7 @@ function Profile({ profileData, isOwnProfile, handleShowModal, fetchProfile}) {
                             <div className="mb-4">
                                 {defaultProfileData.bio && (
                                     <div className="bio-container p-3 bg-light rounded">
-                                        <p className="mb-0 text-break" style={{ 
+                                        <p className="mb-0 text-break" style={{
                                             lineHeight: '1.6',
                                             fontSize: '0.95rem',
                                             maxWidth: '100%',
@@ -204,8 +261,8 @@ function Profile({ profileData, isOwnProfile, handleShowModal, fetchProfile}) {
                             </div>
 
                             {isOwnProfile ? (
-                                <Button 
-                                    variant="outline-success" 
+                                <Button
+                                    variant="outline-success"
                                     className="rounded-pill"
                                     onClick={handleShowModal}
                                 >
@@ -215,7 +272,8 @@ function Profile({ profileData, isOwnProfile, handleShowModal, fetchProfile}) {
                             ) : (
                                 <Button
                                     onClick={followHandle}
-                                    style={getFollowButtonStyles()}
+                                    variant={isFollowing ? "outline-success" : "success"}
+                                    className="rounded-pill"
                                     disabled={isLoading}
                                 >
                                     {isFollowing ? 'Following' : 'Follow'}
