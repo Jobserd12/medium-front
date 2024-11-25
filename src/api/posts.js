@@ -23,13 +23,5 @@ export const handleLikePostAPI = (jsonData) =>
     
 export const handleBookmarkPostAPI = (jsonData) => 
     apiInstance.post("admin/post/bookmark-post/", jsonData)
-    
-export const handleCommentPostAPI = (jsonData) => 
-    apiInstance.post("admin/post/comment-post/", jsonData)
 
-export const handleSubmitReplyAPI = (jsonData) => 
-    apiInstance.post("admin/reply-comment/", jsonData)
-
-export const fetchCommentAPI = () => 
-    apiInstance.get("admin/comment-list/")
 

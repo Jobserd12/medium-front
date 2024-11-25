@@ -9,10 +9,8 @@ import Login from "./views/auth/Login";
 import Logout from "./views/auth/Logout";
 import ForgotPassword from "./views/auth/ForgotPassword";
 import CreatePassword from "./views/auth/CreatePassword";
-import Posts from "./views/admin/Posts";
 import CreatePost from "./views/admin/CreatePost";
 import EditPost from "./views/admin/EditPost";
-import Comments from "./views/admin/Comments";
 import Notifications from "./views/admin/Notifications";
 import ErrorBoundary from "./utils/ErrorBoundary ";
 import MainWrapper from "./layouts/MainWrapper";
@@ -57,11 +55,9 @@ function App() {
                   <Route path="/stats" element={<Stats />} />
                   <Route path="/logout" element={<Logout />} />
 
-                  <Route path="/post" element={<Posts />} />
                   <Route path="/new-post" element={<CreatePost />} />
                   <Route path="/edit-post/:id" element={<EditPost />} />
 
-                  <Route path="/comments" element={<Comments />} />
                   <Route path="/notifications" element={<Notifications />} />
                 </Route>
 
