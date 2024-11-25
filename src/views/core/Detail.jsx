@@ -7,8 +7,10 @@ import moment from "moment";
 import Toast from "../../plugin/Toast";
 import useUserData from "../../plugin/useUserData";
 import { useQueryClient } from "@tanstack/react-query";
-import { fetchPostsDetailAPI, handleBookmarkPostAPI, handleCommentPostAPI, handleLikePostAPI } from "../../api/posts";
+import { fetchPostsDetailAPI, handleBookmarkPostAPI, handleLikePostAPI } from "../../api/posts";
 import Login from "../auth/Login";
+import { handleCommentPostAPI, handleCommentUpdateAPI, handleDeleteCommentAPI } from "../../api/comment";
+import Comment from "../../components/post/comment";
 
 function Detail() {
   const [post, setPost] = useState([]);
@@ -60,31 +62,52 @@ function Detail() {
     });
   };
 
-  const handleCreateCommentSubmit = async (e) => {
-    e.preventDefault();
-    if (!userData) {
-      return setShowLoginModal(true)
-    }
-    const jsonData = {
-      post_id: post?.id,
-      name: post.profile.full_name,
-      email: post.user.email,
-      comment: createComment.comment,
-      user_id: userData?.user_id
-    };
-    
-    try {
-      const res = await handleCommentPostAPI(jsonData);
-      fetchPost();
-      Toast("success", "Comment Posted.", "");
-      setCreateComment({
-        comment: "",
-      });
-    } catch(err) {
+    const handleCreateCommentSubmit = async (e) => {
+      e.preventDefault();
+      if (!userData) {
+        return setShowLoginModal(true)
+      }
 
-    }
+      try {
+        const res = await handleCommentPostAPI({
+          post_id: post?.id,
+          content: createComment.comment
+        });
+        queryClient.invalidateQueries(['posts']);  
+        await fetchPost();
+        setCreateComment({
+          comment: "",
+        });
+      } catch(err) {
+        Toast("error", "Comment error");
+        console.error(err);
+      }
   };
 
+  const handleEditComment = async (commentData) => {
+    try {
+      const jsonData = {
+        comment_id: commentData.commentId,
+        content: commentData.content
+      };
+      
+      await handleCommentUpdateAPI(jsonData);
+      fetchPost();
+    } catch (err) {
+      Toast("error", "Error updating comment", "");
+    }
+  };
+  
+    const handleDeleteComment = async (commentId) => {
+      try {
+        await handleDeleteCommentAPI(commentId);
+        Toast("success", "Comment successfully deleted", "");
+        fetchPost(); 
+      } catch (err) {
+        Toast("error", "Error deleting comment", "");
+      }
+    };
+  
   const handleLikePost = async (postId) => {
       if (!userData) {
           return setShowLoginModal(true)
@@ -98,7 +121,7 @@ function Detail() {
             Toast("success", res.data.message, "");
           }
       } catch (err) {
-          console.error("Error liking post:", err);
+        Toast("error", "Error liking post", "");
       }
   };
   
@@ -115,7 +138,7 @@ function Detail() {
             Toast("success", res.data.message, "");
           }
       } catch (err) {
-          console.error("Error bookmarking post:", err);
+          Toast("error", "Error bookmarking post", "");
       }
   };
 
@@ -267,40 +290,22 @@ function Detail() {
                 </Form>
             </Card>
 
-            {post.comments?.map((c, index) => (
-                <Card key={index} className="mb-3 shadow-sm rounded">
-                    <Card.Body className="d-flex">
-                        <Image
-                            src={c.user_profile.image}
-                            roundedCircle
-                            fluid
-                            style={{ width: "50px", height: "50px", objectFit: "cover" }}
-                            alt="profile"
-                            className="me-3"
-                        />
-                        <div className="w-100">
-                            <div className="d-flex justify-content-between align-items-center mb-2">
-                                <strong>{c.name || "Anonymous"}</strong>
-                                <span className="text-muted small">{moment(c.date).format("DD MMM, YYYY")}</span>
-                            </div>
-                            <p className="mb-1">{c.comment}</p>
-                            {c.reply && (
-                                <Card className="mt-2 bg-light p-2 rounded">
-                                    <Card.Body>
-                                        <p className="mb-0 fw-bold text-dark">Reply:</p>
-                                        <p className="text-dark">{c.reply}</p>
-                                    </Card.Body>
-                                </Card>
-                            )}
-                        </div>
-                    </Card.Body>
-                </Card>
+            {post.comments?.map((comment, index) => (
+              <Comment
+                key={index}
+                comment={comment}
+                isAuthor={post.user?.id === userData?.user_id}
+                onEdit={handleEditComment}
+                onDelete={handleDeleteComment}
+                userData={userData}
+              />
             ))}
+
         </div>
         </div>
 
         </div>
-      <Login show={showLoginModal} handleClose={() => setShowLoginModal(false)} />
+        <Login show={showLoginModal} handleClose={() => setShowLoginModal(false)} />
       </section>
     </>
   );
