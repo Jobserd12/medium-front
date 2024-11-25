@@ -1,120 +1,244 @@
 import React, { useState } from "react";
-import Header from "../partials/Header";
-import Footer from "../partials/Footer";
-import { useParams, Link, useNavigate } from "react-router-dom";
-
-import apiInstance from "../../utils/axios";
-import { useAuthStore } from "../../store/auth";
+import { Modal, Form, Button } from 'react-bootstrap';
 import { register } from "../../utils/auth";
 
-function Register() {
-    const [bioData, setBioData] = useState({ full_name: "", email: "", password: "", password2: "" });
+const EMAIL_REGEX = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+const NAME_REGEX = /^[a-zA-Z\s]{2,30}$/;
+const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>])(?=.*\d).{8,}$/;
+
+const Register = ({ show, handleClose, onSwitchToLogin }) => {
+    const [formData, setBioData] = useState({
+        full_name: "",
+        email: "",
+        password: "",
+        password2: ""
+    });
+    const [errors, setErrors] = useState({});
     const [isLoading, setIsLoading] = useState(false);
-    const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
-    const navigate = useNavigate();
+    const [serverError, setServerError] = useState("");
 
-    const handleBioDataChange = (event) => {
-        setBioData({
-            ...bioData,
-            [event.target.name]: event.target.value,
-        });
+    const validateField = (name, value, allValues = formData) => {
+        switch (name) {
+            case 'full_name':
+                if (!value) return 'Full name is required';
+                if (!NAME_REGEX.test(value)) return 'Please enter a valid name (2-30 letters)';
+                return '';
+            case 'email':
+                if (!value) return 'Email is required';
+                if (!EMAIL_REGEX.test(value)) return 'Please enter a valid email';
+                return '';
+            case 'password':
+                if (!value) return 'Password is required';
+                if (!PASSWORD_REGEX.test(value)) {
+                    return 'Password must contain 8+ characters, uppercase, lowercase and numbers';
+                }
+                return '';
+            case 'password2':
+                if (!value) return 'Password confirmation is required';
+                if (value !== allValues.password) return 'Passwords do not match';
+                return '';
+            default:
+                return '';
+        }
     };
 
-    const resetForm = () => {
-        setBioData({
-            full_name: "",
-            email: "",
-            password: "",
-            password2: "",
-        });
+    const handleInputChange = (event) => {
+        const { name, value } = event.target;
+        const newFormData = {
+            ...formData,
+            [name]: value
+        };
+        
+        setBioData(newFormData);
+        
+        // Validate the changed field
+        setErrors(prev => ({
+            ...prev,
+            [name]: validateField(name, value, newFormData)
+        }));
+        
+        // Special case for password confirmation
+        if (name === 'password' && formData.password2) {
+            setErrors(prev => ({
+                ...prev,
+                password2: validateField('password2', formData.password2, newFormData)
+            }));
+        }
+        
+        setServerError("");
     };
 
-    const handleRegister = async (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
+        setServerError("");
 
-        const { error } = await register(bioData.full_name, bioData.email, bioData.password, bioData.password2);
-        if (error) {
-            alert(JSON.stringify(error));
-            resetForm();
-        } else {
-            navigate("/");
+        // Validate all fields
+        const newErrors = {};
+        Object.keys(formData).forEach(key => {
+            const error = validateField(key, formData[key], formData);
+            if (error) newErrors[key] = error;
+        });
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            setIsLoading(false);
+            return;
         }
 
-        // Reset isLoading to false when the operation is complete
+        try {
+            const { error } = await register(
+                formData.full_name,
+                formData.email,
+                formData.password,
+                formData.password2
+            );
+
+            if (error) {
+                setServerError(typeof error === 'string' ? error : 'Registration failed. Please try again.');
+            } else {
+                handleClose();
+            }
+        } catch (err) {
+            setServerError("An error occurred during registration. Please try again.");
+        }
+
         setIsLoading(false);
     };
 
     return (
-        <>
-            <section className="container d-flex flex-column vh-100">
-                <div className="row align-items-center justify-content-center g-0 h-lg-100 py-8">
-                    <div className="col-lg-5 col-md-8 py-8 py-xl-0">
-                        <div className="card shadow bg-secondary ">
-                            <div className="card-body p-6">
-                                <div className="mb-4">
-                                    <h1 className="mb-1 fs-3 fw-bold">Sign up</h1>                                
-                                </div>
-                                {/* Form */}
-                                <form className="needs-validation" onSubmit={handleRegister}>
-                                    {/* Username */}
-                                    <div className="mb-3">
-                                        <label htmlFor="email" className="form-label">
-                                            Full Name
-                                        </label>
-                                        <input type="text" onChange={handleBioDataChange} value={bioData.full_name} id="full_name" className="form-control" name="full_name" placeholder="John Doe" required="" />
-                                    </div>
-                                    <div className="mb-3">
-                                        <label htmlFor="email" className="form-label">
-                                            Email Address
-                                        </label>
-                                        <input type="email" onChange={handleBioDataChange} value={bioData.email} id="email" className="form-control" name="email" placeholder="johndoe@gmail.com" required="" />
-                                    </div>
+        <Modal 
+            show={show} 
+            onHide={handleClose}
+            centered
+            className="fade"
+            contentClassName="border-0 shadow-lg"
+        >
+            <Modal.Header closeButton className="border-0 bg-light py-2">
+                <Modal.Title className="fs-5 fw-light d-flex align-items-center">
+                    <i className="fas fa-user-plus me-2 small"></i>
+                    Sign Up
+                </Modal.Title>
+            </Modal.Header>
+            <Modal.Body className="px-4 py-4">
+                <Form onSubmit={handleSubmit} noValidate>
+                    <Form.Group className="mb-3">
+                        <Form.Label className="text-muted small">Full Name</Form.Label>
+                        <Form.Control
+                            type="text"
+                            name="full_name"
+                            value={formData.full_name}
+                            onChange={handleInputChange}
+                            placeholder="John Doe"
+                            className={`border-0 bg-light ${errors.full_name ? 'is-invalid' : ''}`}
+                            required
+                        />
+                        {errors.full_name && (
+                            <Form.Text className="text-danger small">
+                                {errors.full_name}
+                            </Form.Text>
+                        )}
+                    </Form.Group>
 
-                                    {/* Password */}
-                                    <div className="mb-3">
-                                        <label htmlFor="password" className="form-label">
-                                            Password
-                                        </label>
-                                        <input type="password" onChange={handleBioDataChange} value={bioData.password} id="password" className="form-control" name="password" placeholder="**************" required="" />
-                                    </div>
-                                    <div className="mb-3">
-                                        <label htmlFor="password" className="form-label">
-                                            Confirm Password
-                                        </label>
-                                        <input type="password" onChange={handleBioDataChange} value={bioData.password2} id="password" className="form-control" name="password2" placeholder="**************" required="" />
-                                    </div>
-                                    <span className="d-flex justify-content-end">
-                                        Already have an account?
-                                        <Link to="/login/" className="ms-1 text-black">
-                                            Sign In
-                                        </Link>
-                                    </span>
-                                    <div>
-                                        <div className="d-grid mt-4">
-                                            <button className="btn btn-primary w-100" type="submit" disabled={isLoading}>
-                                                {isLoading ? (
-                                                    <>
-                                                        <span className="mr-2 ">Processing...</span>
-                                                        <i className="fas fa-spinner fa-spin" />
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <span>Sign Up</span> { "  " }                                                        {" "}
-                                                        <i className="fas fa-user-plus" />
-                                                    </>
-                                                )}
-                                            </button>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
+                    <Form.Group className="mb-3">
+                        <Form.Label className="text-muted small">Email</Form.Label>
+                        <Form.Control
+                            type="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleInputChange}
+                            placeholder="john@example.com"
+                            className={`border-0 bg-light ${errors.email ? 'is-invalid' : ''}`}
+                            required
+                        />
+                        {errors.email && (
+                            <Form.Text className="text-danger small">
+                                {errors.email}
+                            </Form.Text>
+                        )}
+                    </Form.Group>
+
+                    <Form.Group className="mb-3">
+                        <Form.Label className="text-muted small">Password</Form.Label>
+                        <Form.Control
+                            type="password"
+                            name="password"
+                            value={formData.password}
+                            onChange={handleInputChange}
+                            placeholder="••••••••"
+                            className={`border-0 bg-light ${errors.password ? 'is-invalid' : ''}`}
+                            required
+                        />
+                        {errors.password && (
+                            <Form.Text className="text-danger small">
+                                {errors.password}
+                            </Form.Text>
+                        )}
+                    </Form.Group>
+
+                    <Form.Group className="mb-4">
+                        <Form.Label className="text-muted small">Confirm Password</Form.Label>
+                        <Form.Control
+                            type="password"
+                            name="password2"
+                            value={formData.password2}
+                            onChange={handleInputChange}
+                            placeholder="••••••••"
+                            className={`border-0 bg-light ${errors.password2 ? 'is-invalid' : ''}`}
+                            required
+                        />
+                        {errors.password2 && (
+                            <Form.Text className="text-danger small">
+                                {errors.password2}
+                            </Form.Text>
+                        )}
+                    </Form.Group>
+
+                    {serverError && (
+                        <div className="alert alert-danger py-2 small" role="alert">
+                            <i className="fas fa-exclamation-circle me-2"></i>
+                            {serverError}
                         </div>
+                    )}
+
+                    <Button 
+                        type="submit"
+                        className="w-100 py-2 text-white"
+                        variant="dark"
+                        disabled={isLoading}
+                    >
+                        {isLoading ? (
+                            <>
+                                <i className="fas fa-spinner fa-spin me-2"></i>
+                                Processing...
+                            </>
+                        ) : (
+                            <>
+                                <i className="fas fa-user-plus me-2"></i>
+                                Sign Up
+                            </>
+                        )}
+                    </Button>
+
+                    <div className="text-center mt-3">
+                        <small className="text-muted">
+                            Already have an account?{" "}
+                            <Button 
+                                variant="link" 
+                                className="p-0 text-dark text-decoration-none small"
+                                onClick={() => {
+                                    handleClose();
+                                    onSwitchToLogin();
+                                }}
+                            >
+                                Sign In
+                            </Button>
+                        </small>
                     </div>
-                </div>
-            </section>
-        </>
+                </Form>
+            </Modal.Body>
+        </Modal>
     );
-}
+};
 
 export default Register;

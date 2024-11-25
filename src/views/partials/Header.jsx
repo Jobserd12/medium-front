@@ -7,10 +7,13 @@ import UserProfile from '../../components/ui/userProfile';
 import useNotificationStore from '../../store/useNotificationStore';
 import useUserData from '../../plugin/useUserData';
 import { useNotification } from '../../hooks/notification/useNotification';
+import Register from '../auth/Register';
 
 function Header() {
     const isLoggedIn = useAuthStore((state) => state.isLoggedIn());
     const [showLoginModal, setShowLoginModal] = useState(false);
+    const [showRegisterModal, setShowRegisterModal] = useState(false);
+
     const unreadCount = useNotificationStore((state) => state.unreadCount); 
     const location = useLocation();
     const navigate = useNavigate();
@@ -18,6 +21,14 @@ function Header() {
     const { refetch } = useNotification();
 
     const handleShowLoginModal = () => setShowLoginModal(!showLoginModal);
+    const handleShowRegisterModal = () => setShowRegisterModal(!showRegisterModal);
+    const switchToRegister = () => {
+        handleShowRegisterModal();
+    };
+    const switchToLogin = () => {
+        handleShowLoginModal();
+    };
+
     const isActive = (path) => location.pathname === path ? 'active-link' : '';
 
     const handleSearch = (q) => {
@@ -77,10 +88,10 @@ function Header() {
                                 ) : (
                                     <>
                                         <li className="nav-item">
-                                            <Link to="/register/" className="btn text-black fw-bold">Sign up</Link>
+                                            <button onClick={handleShowRegisterModal} className="btn text-black fw-bold">Sign up</button>
                                         </li>
                                         <li className="nav-item">
-                                            <button onClick={handleShowLoginModal} className="btn bg-black text-white fw-bold me-2">Log in</button>
+                                            <button onClick={handleShowLoginModal} className="btn bg-black text-white fw-bold me-2">Sign in</button>
                                         </li>
                                     </>
                                 )}
@@ -89,7 +100,8 @@ function Header() {
                     </div>
                 </div>
             </nav>
-            <Login show={showLoginModal} handleClose={handleShowLoginModal} />
+            <Login show={showLoginModal} handleClose={handleShowLoginModal}  onSwitchToRegister={switchToRegister}/>
+            <Register show={showRegisterModal} handleClose={handleShowRegisterModal} onSwitchToLogin={switchToLogin} />
         </header>
     );
 }
