@@ -128,6 +128,8 @@ function CreatePost() {
   const [imagePreview, setImagePreview] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const userId = useUserData()?.user_id;
+  const username = useUserData()?.username;
+
   const navigate = useNavigate();
 
   const editor = useEditor({
@@ -209,7 +211,7 @@ function CreatePost() {
         icon: "success",
         title: "Post created successfully",
       });
-      navigate("/posts/");
+      navigate(`/profile/@${username}`);
     } catch (error) {
       Toast("error", "Error creating post");
     } finally {
@@ -341,7 +343,7 @@ function CreatePost() {
                     className={`form-select ${errors.status ? 'is-invalid' : ''}`}
                     {...register("status")}
                   >
-                    <option value="Active">Publish</option>
+                    <option value="Published">Publish</option>
                     <option value="Draft">Draft</option>
                     <option value="Disabled">Disabled</option>
                   </select>

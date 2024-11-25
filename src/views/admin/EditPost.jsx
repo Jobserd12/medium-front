@@ -14,7 +14,6 @@ import useUserData from "../../plugin/useUserData";
 import Toast from "../../plugin/Toast";
 import Swal from "sweetalert2";
 
-// Esquema de validación modificado para edición (la imagen es opcional)
 const editPostSchema = z.object({
   title: z.string()
     .min(1, "Title is required")
@@ -34,7 +33,6 @@ const editPostSchema = z.object({
     .min(1, "Content is required")
 });
 
-// Menu Bar Component for TipTap (igual que en CreatePost)
 const MenuBar = ({ editor }) => {
   if (!editor) return null;
 
@@ -129,6 +127,7 @@ function EditPost() {
   const userId = useUserData()?.user_id;
   const navigate = useNavigate();
   const { id } = useParams();
+  const username = useUserData()?.username;
 
   const editor = useEditor({
     extensions: [
@@ -165,23 +164,21 @@ function EditPost() {
       // Establecer los valores iniciales en el formulario
       reset({
         title: post.title,
-        preview: post.description,
+        preview: post.preview,
         category: post.category?.id.toString(),
         tags: post.tags,
         status: post.status,
         content: post.content
       });
 
-      // Establecer el contenido en el editor
       if (editor) {
         editor.commands.setContent(post.content);
       }
 
-      // Establecer la imagen de vista previa
       setImagePreview(post.image);
     } catch (error) {
       Toast("error", "Error loading post");
-      navigate("/posts/");
+      navigate(`/profile/@${username}`);
     }
   };
 
@@ -217,9 +214,8 @@ function EditPost() {
     const formData = new FormData();
     formData.append("user_id", userId);
     formData.append("title", data.title);
-    if (data.image?.[0]) {
-      formData.append("image", data.image[0]);
-    }
+
+    formData.append("image", data.image[0]);
     formData.append("preview", data.preview);
     formData.append("content", data.content);
     formData.append("tags", data.tags);
@@ -237,7 +233,7 @@ function EditPost() {
         icon: "success",
         title: "Post updated successfully",
       });
-      navigate("/posts/");
+      navigate(`/profile/@${username}`);
     } catch (error) {
       Toast("error", "Error updating post");
     } finally {
@@ -370,7 +366,7 @@ function EditPost() {
                     className={`form-select ${errors.status ? 'is-invalid' : ''}`}
                     {...register("status")}
                   >
-                    <option value="Active">Publish</option>
+                    <option value="Published">Publish</option>
                     <option value="Draft">Draft</option>
                     <option value="Disabled">Disabled</option>
                   </select>

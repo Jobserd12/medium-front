@@ -25,19 +25,20 @@ function ProfilePage() {
         setError(null);
         try {
             const cleanUsername = username.substring(1);
-            const profileRes = await fetchProfileAPI(cleanUsername);
+            const res = await fetchProfileAPI(cleanUsername);
+            console.log(res.data)
             const profileWithCurrentUser = {
-                ...profileRes.data,
+                ...res.data,
                 currentUserUsername: userData?.username
             };
             setProfileData(profileWithCurrentUser);
         } catch (err) {
+            console.log(err.response.data)
             setError('Error loading profile');
         } finally {
             setLoading(false);
         }
     };
-
 
     const handleProfileUpdate = (updatedProfile) => {
         setProfileData(updatedProfile);

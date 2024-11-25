@@ -57,16 +57,12 @@ const UserProfile = () => {
                 <i className={isActive(`/profile/@${username}`) ? "fas fa-user " : "fa-regular fa-user"}></i>
                 <span>Profile</span>
             </Link>
-            <Link to="/post" className="dropdown-item d-flex align-items-center gap-3"> 
-                <i className={isActive("/post") ? "fa fa-newspaper" : "fa-regular fa-newspaper"}></i> 
-                <span>Pots</span> 
-            </Link> 
             <Link to="/stats" className="dropdown-item d-flex align-items-center gap-3"> 
                 <i className={isActive("/stats") ? "fa fa-star" : "fa-regular fa-star"}></i> 
                 <span>Stats</span> 
             </Link> 
             <Dropdown.Divider /> 
-                <Link to="/settings" className="dropdown-item d-flex align-items-center gap-3"> <span>Configuración</span> 
+                <Link to="#" className="dropdown-item d-flex align-items-center gap-3"> <span>Configuración</span> 
             </Link> 
             <Link to="/help" className="dropdown-item d-flex align-items-center gap-3"> 
                 <span>Ayuda</span> 

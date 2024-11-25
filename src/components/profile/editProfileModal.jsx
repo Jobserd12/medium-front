@@ -18,7 +18,6 @@ function EditProfileModal({ show, handleClose, username, currentProfile, onProfi
     const [imagePreview, setImagePreview] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const fileInputRef = useRef(null)
-    const userData = useUserData()
     const [bio, setBio] = useState(profileData.bio || ''); 
 
     useEffect(() => {
@@ -202,8 +201,8 @@ function EditProfileModal({ show, handleClose, username, currentProfile, onProfi
                                     placeholder="Short bio (optional)"
                                     className="border-0 border-bottom rounded-0 px-0 resize-none"
                                 />
-                                <div className="position-absolute bottom-0 end-0 text-muted small">
-                                    {profileData.bio.length}/{charLimit}
+                              <div className="position-absolute bottom-0 end-0 text-muted small">
+                                    {profileData.bio ? profileData.bio.length : 0}/{charLimit}
                                 </div>
                             </Form.Group>
                         </Col>

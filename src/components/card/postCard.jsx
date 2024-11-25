@@ -19,9 +19,11 @@ function PostCard({ post }) {
         }
         const jsonData = { user_id: userData?.user_id, post_id: postId };
         try {
-            const res = await apiInstance.post("post/bookmark-post/", jsonData);
+            const res = await apiInstance.post("admin/post/bookmark-post/", jsonData);
             queryClient.invalidateQueries(['posts']);  // Invalidate posts query to refetch the data
-            Toast("success", res.data.message, "");
+            if (res.data.message){
+                Toast("success", res.data.message, "");
+            }
         } catch (err) {
             console.error("Error bookmarking post:", err.response);
         }
